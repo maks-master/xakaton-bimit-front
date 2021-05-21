@@ -41,6 +41,14 @@
           this.addMesh()
           this.viewer.cameraFlight.flyTo(this.model)
         });
+
+        this.viewer.cameraControl.on("picked", (pickResult) => {
+          console.log('‼️ Res pickResult:', pickResult)
+          console.log('‼️ Res pickResult._worldPos:', pickResult._worldPos)
+          console.log('‼️ Res pickResult.position:', pickResult.position)
+          console.log('‼️ Res pickResult.entity.id:', pickResult.entity.id)
+        })
+
       },
 
       addMesh(){
@@ -52,16 +60,16 @@
 
         new Node(this.viewer.scene, {
             id: "table",
-            isModel: false, // <---------- Node represents a model, so is registered by ID in viewer.scene.models
+            isModel: false,
             rotation: [0, 50, 0],
             position: [0, 0, 0],
             scale: [1, 1, 1],
 
             children: [
 
-                new Mesh(this.viewer.scene, { // Red table leg
+                new Mesh(this.viewer.scene, {
                     id: "redLeg",
-                    isObject: true, // <------ Node represents an object, so is registered by ID in viewer.scene.objects
+                    isObject: true,
                     position: [-4, -6, -4],
                     scale: [1, 3, 1],
                     rotation: [0, 0, 0],
@@ -71,9 +79,9 @@
                     geometry: boxGeometry
                 }),
 
-                new Mesh(this.viewer.scene, { // Green table leg
+                new Mesh(this.viewer.scene, {
                     id: "greenLeg",
-                    isObject: true, // <------ Node represents an object, so is registered by ID in viewer.scene.objects
+                    isObject: true,
                     position: [4, -6, -4],
                     scale: [1, 3, 1],
                     rotation: [0, 0, 0],
@@ -83,9 +91,9 @@
                     geometry: boxGeometry
                 }),
 
-                new Mesh(this.viewer.scene, {// Blue table leg
+                new Mesh(this.viewer.scene, {
                     id: "blueLeg",
-                    isObject: true, // <------ Node represents an object, so is registered by ID in viewer.scene.objects
+                    isObject: true,
                     position: [4, -6, 4],
                     scale: [1, 3, 1],
                     rotation: [0, 0, 0],
@@ -95,9 +103,9 @@
                     geometry: boxGeometry
                 }),
 
-                new Mesh(this.viewer.scene, {  // Yellow table leg
+                new Mesh(this.viewer.scene, {
                     id: "yellowLeg",
-                    isObject: true, // <------ Node represents an object, so is registered by ID in viewer.scene.objects
+                    isObject: true,
                     position: [-4, -6, 4],
                     scale: [1, 3, 1],
                     rotation: [0, 0, 0],
@@ -107,9 +115,9 @@
                     geometry: boxGeometry
                 }),
 
-                new Mesh(this.viewer.scene, { // Purple table top
+                new Mesh(this.viewer.scene, {
                     id: "tableTop",
-                    isObject: true, // <------ Node represents an object, so is registered by ID in viewer.scene.objects
+                    isObject: true,
                     position: [0, -3, 0],
                     scale: [6, 0.5, 6],
                     rotation: [0, 0, 0],
