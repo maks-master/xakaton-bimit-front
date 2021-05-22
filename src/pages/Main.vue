@@ -104,14 +104,18 @@
           pbrEnabled: true,
         })
 
-        let objectDefaults = {
+        let objectDefaults = { 
           IfcSpace: { 
-            pickable: true, 
-            opacity: 0.5
+            pickable: false, 
+            opacity: 0.2
           },
+          IfcWindow: {
+            colorize: [0.2578125, 0.6953125, 0.84765625],
+            opacity: 0.6
+          }
         }
 
-        this.xktLoader = new XKTLoaderPlugin(this.viewer, { objectDefaults });
+        this.xktLoader = new XKTLoaderPlugin(this.viewer);
 
         this.model = this.xktLoader.load({
           id: "myModel",

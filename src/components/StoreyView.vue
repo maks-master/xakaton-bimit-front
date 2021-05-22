@@ -1,7 +1,8 @@
 <template lang="pug">
   .ma-2
     div {{ name }}
-    img.storey( :src="storeyMap.imageData" :style="imgStyle" )
+    .wrapper( :style="wrapperStyle" )
+      img.storey( :src="storeyMap.imageData" :style="imgStyle" )
 </template>
 
 <script>
@@ -14,13 +15,26 @@ export default {
   },
 
   computed: {
+    wrapperStyle () {
+      return `width: ${maxStoreySize + 12}px; height: ${maxStoreySize + 12}px;`
+    },
+
     imgStyle () {
       let aspectRatio = this.storeyMap.width / this.storeyMap.height
       let width = aspectRatio >= 1 ? maxStoreySize : maxStoreySize * aspectRatio
-      let height = aspectRatio <= 1 ? maxStoreySize : maxStoreySize * aspectRatio
+      let height = aspectRatio >= 1 ? maxStoreySize / aspectRatio : maxStoreySize
       
-      return `border: 1px solid #000000; background: lightblue; opacity: 0.8; width: ${width}px; height: ${height}px;`
+      return `align-self: center; width: ${width}px; height: ${height}px;`
     },
   }
 }
 </script>
+
+<style scoped>
+.wrapper {
+  display: flex;
+  justify-content: center;
+  border: 1px solid gray; 
+  padding: 5px;
+}
+</style>
