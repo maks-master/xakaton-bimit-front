@@ -14,6 +14,7 @@
           @click.native="onStoreyClick(s)" 
           )
     
+    
     timeline.timeline( @click="onEventClick" )
 
     v-card.main-plan( v-if="current" )
