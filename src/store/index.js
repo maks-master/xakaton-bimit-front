@@ -7,7 +7,14 @@ export default new Vuex.Store({
   state: {
     devices: [],
 
-    devicesEditMode:false
+    devicesEditMode:false,
+    deviceToEdit:null,
+
+    deviceEditDialog:{
+      show:false,
+      title:'',
+      device:null
+    }
   },
 
   getters: {
@@ -22,6 +29,15 @@ export default new Vuex.Store({
     SET_SENSORS_EDIT_MODE: (state, isEditMode) => {
       state.devicesEditMode = isEditMode
     },
+
+    SET_DEVICE_TO_EDIT: (state, deviceToEdit) => {
+      state.deviceToEdit = deviceToEdit
+    },
+
+    SET_DEVICE_EDIT_DIALOG: (state, d) => {
+      state.deviceEditDialog = d
+    }
+
   },
 
   actions: {

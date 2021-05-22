@@ -33,6 +33,24 @@
             v-img( src="/icons/lightning_bolt_96px.png" height="48" contain )
         span Показать только датчики напряжения
 
+    v-dialog(v-model="deviceEditDialog.show" v-if="deviceEditDialog.device" max-width="500")
+      v-card
+        v-card-title {{ deviceEditDialog.title }}
+
+        v-card-text
+          v-text-field(v-model="deviceEditDialog.device.name" label="Название")
+          v-text-field(v-model="deviceEditDialog.device.frequency" label="Частота")
+          v-text-field(v-model="deviceEditDialog.device.minValue" label="Минимум")
+          v-text-field(v-model="deviceEditDialog.device.maxValue" label="Максимум")
+
+          div позиция {{ deviceEditDialog.device.position }}
+          div камера {{ deviceEditDialog.device.cameraPosition }}
+          div elementId {{ deviceEditDialog.device.elementId }}
+        v-card-actions
+          v-spacer
+          v-btn(@click="cancelEditSensor") Отмена
+          v-btn(@click="saveEditSensor") Сохранить
+
 </template>
 
 <script>
@@ -40,7 +58,7 @@
   import { XKTLoaderPlugin } from '@xeokit/xeokit-sdk/src/plugins/XKTLoaderPlugin/XKTLoaderPlugin.js'
 
   // eslint-disable-next-line
-  import { Mesh, Node, PhongMaterial, buildBoxGeometry, ReadableGeometry } from "@xeokit/xeokit-sdk/src/viewer/scene"
+  import { Mesh, Node, PhongMaterial, buildBoxGeometry, ReadableGeometry, VBOGeometry, buildSphereGeometry } from "@xeokit/xeokit-sdk/src/viewer/scene"
 
   // eslint-disable-next-line
   import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
@@ -48,7 +66,7 @@
   import StoreyView from '@/components/StoreyView'
   
 
-  import { mapState, mapGetters } from 'vuex'
+  import { mapState, mapGetters, mapMutations } from 'vuex'
 
   // import VueTimeline from "vue-timeline-component"
   import Timeline from "@/components/Timeline"
@@ -88,11 +106,11 @@
 
     watch: {
       devices: 'onDeviceUpdate',
-      devicesEditMode: 'bindEditMode'
+      deviceToEdit: 'bindEditMode',
     },
 
     computed: {
-      ...mapState(['devicesEditMode']),
+      ...mapState(['devicesEditMode','deviceToEdit','deviceEditDialog']),
       ...mapGetters(['devices'])
     },
 
@@ -101,6 +119,7 @@
     },
 
     methods: {
+      ...mapMutations(['SET_DEVICE_TO_SAVE','SET_DEVICE_EDIT_DIALOG']),
       onDeviceUpdate () {
         this.devices.forEach(device => {
           this.addDevice(device)
@@ -133,6 +152,8 @@
           pbrEnabled: true,
           backfaces: true,
         })
+
+        this.makeHelpMesh()
 
         let objectDefaults = { 
           IfcSpace: { 
@@ -172,6 +193,30 @@
           console.log('‼️ Res pickResult._worldPos:', pickResult._worldPos)
           console.log('‼️ Res pickResult.position:', pickResult.position)
           console.log('‼️ Res pickResult.entity.id:', pickResult.entity.id)
+
+          if (this.deviceToEdit && this.hitHelper && this.hitHelper.node.position) {
+            console.log('‼️ HELPER:', this.deviceToEdit)
+            console.log('‼️ HELPER:', this.hitHelper.node.position)
+
+            let device_EDIT = JSON.parse(JSON.stringify(this.deviceToEdit))
+            if (device_EDIT.position == null) device_EDIT.position = {}
+            device_EDIT.position.x = this.hitHelper.node.position[0]
+            device_EDIT.position.y = this.hitHelper.node.position[1]
+            device_EDIT.position.z = this.hitHelper.node.position[2]
+
+            if (device_EDIT.cameraPosition == null) device_EDIT.cameraPosition = {}
+            device_EDIT.cameraPosition.x = this.viewer.camera.eye[0]
+            device_EDIT.cameraPosition.y = this.viewer.camera.eye[1]
+            device_EDIT.cameraPosition.z = this.viewer.camera.eye[2]
+            device_EDIT.elementId = pickResult.entity.id
+
+            let d = {
+              show:true,
+              title:'Редактировать устройство',
+              device:JSON.parse(JSON.stringify(device_EDIT))
+            }
+            this.SET_DEVICE_EDIT_DIALOG(d)
+          }
         })
       },
 
@@ -385,35 +430,99 @@
       },
 
       bindEditMode(){
-        this.onMouseDown = null
-        let _self = this
-        if (this.devicesEditMode) {
-          this.onMouseDown = _self.viewer.scene.input.on("mousemove", function (coords) {
-              var hit = _self.viewer.scene.pick({
-                  canvasPos: coords
-              });
-
-              if (hit) {
-                  if (!_self.lastEntity || hit.entity.id !== _self.lastEntity.id) {
-                      if (_self.lastEntity) {
-                          _self.lastEntity.highlighted = false;
-                      }
-                      _self.lastEntity = hit.entity;
-                      hit.entity.highlighted = true;
-                  }
-              } else {
-                  if (_self.lastEntity) {
-                      _self.lastEntity.highlighted = false;
-                      _self.lastEntity = null;
-                  }
-              }
-          })
+        this.hitHelper.hide()
+        console.log(this.devicesEditMode)
+        if (this.deviceToEdit && this.devicesEditMode) {
+          if (!this.onMouseMove) this.bindMouseMove()
+          this.viewer.scene.input.setEnabled(true);
         } else {
-          console.log('go in false')
-          _self.viewer.scene.input.off(_self.onMouseDown);
-          if (_self.viewer.scene.highlightedObjects.length > 0) _self.viewer.scene.highlightedObjects.map(e => e.highlighted = false)
+          this.viewer.scene.input.setEnabled(false);
         }
+      },
+
+      bindMouseMove(){
+        let viewer = this.viewer
+        let hitHelper = this.hitHelper
+        this.onMouseMove = viewer.scene.input.on("mousemove", function (coords) {
+
+            var hit = viewer.scene.pick({
+                canvasPos: coords,
+                pickSurface: true
+            });
+
+            if (hit) {
+              hitHelper.show(hit);
+            } else {
+              hitHelper.hide();
+            }
+        })
+      },
+
+      makeHelpMesh(){
+        let viewer = this.viewer
+        this.hitHelper = new (function () {
+
+            const zeroVec = new Float32Array([0, 0, -1]);
+            const quat = new Float32Array(4);
+
+            this.node = new Node(viewer.scene, {
+                pickable: false,
+                visible: true,
+                position: [0, 0, 0],
+
+                children: [
+                    new Mesh(viewer.scene, {
+                        geometry: new VBOGeometry(viewer.scene, buildSphereGeometry({radius: .2})),
+                        material: new PhongMaterial(viewer.scene, {emissive: [1, 0, 0], diffuse: [0, 0, 0]}),
+                        pickable: false
+                    }),
+                    new Mesh(viewer.scene, {
+                        geometry: new VBOGeometry(viewer.scene, {
+                            primitive: "lines",
+                            positions: [
+                                0.0, 0.0, 0.0, 0.0, 0.0, -2.0
+                            ],
+                            indices: [0, 1]
+                        }),
+                        material: new PhongMaterial(viewer.scene, {emissive: [1, 1, 0], diffuse: [0, 0, 0], lineWidth: 4}),
+                        pickable: false
+                    })
+                ]
+            });
+
+            var node = this.node
+            
+
+            this.show = function (hit) {
+                node.position = hit.worldPos;
+                node.visible = true;
+
+                (this._dir = this._dir || math.vec3()).set(hit.worldNormal || [0, 0, 1]);
+                math.vec3PairToQuaternion(zeroVec, this._dir, quat);
+                node.quaternion = quat;
+            };
+
+            this.hide = function () {
+                node.visible = false;
+            };
+        })();
+        
+      },
+
+      cancelEditSensor(){
+        let d = {
+          show:false,
+          title:'',
+          device:null
+        }
+        this.SET_DEVICE_EDIT_DIALOG(d)
+      },
+
+      saveEditSensor(){
+        console.log(this.deviceEditDialog)
+        console.log(this.deviceEditDialog.device)
       }
+
     }
   }
 
