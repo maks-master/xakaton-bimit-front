@@ -3,17 +3,17 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-import BlankLayout from "@/layouts/Blank"
+import DefaultLayout from "@/layouts/Default"
 
 export default new VueRouter({
   routes: [
     {
       path: '/',
-      component: BlankLayout,
+      component: DefaultLayout,
       children: [
         { 
           path: '', 
-          component: () => import('@/components/Home.vue'), 
+          component: () => import('@/pages/Main.vue'), 
           alias: ['/home', '/index'] 
         }
       ]
