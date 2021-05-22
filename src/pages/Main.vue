@@ -35,9 +35,11 @@
 
     mounted () {
       this.init()
+      this.$store.dispatch('getDevices')
     },
 
     methods: {
+
       init() {
         this.viewer = new Viewer({
           canvasId: "myCanvas",
