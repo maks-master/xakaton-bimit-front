@@ -275,23 +275,26 @@
         this.current = null
         this.cameraMemento.restoreCamera(this.viewer.scene)
         this.objectsMemento.restoreObjects(this.viewer.scene)
+
+        this.deviceMeshes.map(m => m.visible = true)
       },
 
       onStoreyClick (storey) {
         let { storeyMap } = storey
 
         let metaObject = this.viewer.metaScene.metaObjects[storeyMap.storeyId]
-        console.log(metaObject)
-        console.log(this.devices)
-        console.log(this.deviceMeshes)
 
         let devs = this.devices
-        //let sensorMeshes = this.deviceMeshes
+        let sensorMeshes = this.deviceMeshes
+
+        sensorMeshes.map(m => m.visible = false)
+
         metaObject.children.forEach(c => {
-          console.log(c.id)
-          let ss = devs.find(me => me.elementId = c.id)
-          console.log(ss.id)
-          console.log(ss.elementId)
+          let ss = devs.find(me => me.elementId == c.id)
+          if (ss) {
+            let ssmesh = sensorMeshes.find(sm => sm.id == ss.id)
+            if (ssmesh) ssmesh.visible = false
+          }
         })
 
         this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {

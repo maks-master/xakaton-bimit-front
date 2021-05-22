@@ -2,6 +2,7 @@
   v-card
     v-card-title Датчики
     v-card-text
+      v-btn(@click="generate()" color="red") Сгенерировать аварию
       v-tabs(v-model="tab")
         v-tab
           v-icon mdi-eye
@@ -121,6 +122,11 @@ export default {
       let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
       if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
       return out
+    },
+
+    generate(){
+      let url = `http://hakaton.bimit.ru/world/alarm/create`
+      fetch(url)
     }
   }
 }
