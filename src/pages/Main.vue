@@ -9,7 +9,8 @@
           v-for="s in storeys" 
           :key="s.storeyMap.storeyId" 
           :storeyMap="s.storeyMap" 
-          :name="s.name" 
+          :name="s.name"
+          :devices="s.devices"
           :selected="current && current.storeyMap.storeyId == s.storeyMap.storeyId" 
           @click.native="onStoreyClick(s)" 
           )
@@ -257,17 +258,24 @@
         };
 
         for (var i = 0, len = storeyIds.length; i < len; i++) {
+          const storeyId = storeyIds[i];
 
-            const storeyId = storeyIds[i];
+          const storeyMap = this.storeyViewsPlugin.createStoreyMap(storeyId, {
+            format: "png",
+            width: 200,
+            useObjectStates: true
+          });
 
-            const storeyMap = this.storeyViewsPlugin.createStoreyMap(storeyId, {
-              format: "png",
-              width: 200,
-              useObjectStates: true
-            });
+          let list = []
+          this.devices.forEach(item => {
+            let sm = this.findStoreyFromElement(item.elementId)
+            if (sm && sm.id == storeyMap.storeyId) {
+              list.push(item.uuid)
+            }
+          })
 
-            let metaObject = this.viewer.metaScene.metaObjects[storeyId]
-            this.storeys.push({ storeyMap, name: metaObject.name })
+          let metaObject = this.viewer.metaScene.metaObjects[storeyId]
+          this.storeys.push({ storeyMap, name: metaObject.name, devices: list })
         }
       },
 
