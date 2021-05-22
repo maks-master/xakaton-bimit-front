@@ -2,7 +2,9 @@
 
   div
     canvas#myCanvas
-    div#storeys
+    .wrapper
+      .storeys
+        storey-view( v-for="{ storeyMap, name } in storeys" :key="storeyMap.storeyId" :storeyMap="storeyMap" :name="name" @click.native="onStoreyClick(storeyMap)" )
     v-btn( @click="onCancelStorey" ) cancel
 
 </template>
@@ -15,9 +17,16 @@
   // eslint-disable-next-line
   import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
 
+  import StoreyView from '@/components/StoreyView'
+
   export default {
+
+    components: {
+      StoreyView
+    },
+
     data: () => ({
-      
+      storeys: []
     }),
 
     mounted () {
@@ -65,7 +74,6 @@
 
         this.objectsMemento = new ObjectsMemento();
 
-        const storeyDiv = document.getElementById("storeys")
         const storeyIds = Object.keys(this.storeyViewsPlugin.storeys);
 
         // eslint-disable-next-line
@@ -82,40 +90,12 @@
 
             const storeyMap = this.storeyViewsPlugin.createStoreyMap(storeyId, {
                 format: "png",
-                width: 300,
+                width: 200,
                 useObjectStates: true
             });
 
-
-            const img = document.createElement("img");
-            img.src = storeyMap.imageData;
-            img.style.border = "1px solid #000000";
-            img.style.background = "lightblue";
-            img.style.width = storeyMap.width + "px";
-            img.style.height = storeyMap.height + "px";
-            img.style.opacity = 0.8;
-
-            storeyDiv.appendChild(img);
-
-            img.onclick = () => {
-              console.log(storeyMap.storeyId);
-              this.cameraMemento.saveCamera(this.viewer.scene)
-              this.objectsMemento.saveObjects(this.viewer.scene)
-
-              this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
-                hideOthers: true,
-                useObjectStates: false
-              });
-
-              this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
-                  projection: "perspective", // Perspective projection
-                  duration: 2.0,       // 2.5 second transition
-                  fitFOV: 65,
-                  done: () => {
-                      this.viewer.cameraControl.planView = true; // Disable rotation
-                  }
-              });
-            }
+            let metaObject = this.viewer.metaScene.metaObjects[storeyId]
+            this.storeys.push({ storeyMap, name: metaObject.name })
 
             // img.onmouseenter = () => {
             //     img.style.cursor = "default";
@@ -185,6 +165,27 @@
       onCancelStorey () {
         this.cameraMemento.restoreCamera(this.viewer.scene)
         this.objectsMemento.restoreObjects(this.viewer.scene)
+      },
+
+      onStoreyClick (storeyMap) {
+        console.log(storeyMap.storeyId)
+
+        this.cameraMemento.saveCamera(this.viewer.scene)
+        this.objectsMemento.saveObjects(this.viewer.scene)
+
+        this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
+          hideOthers: true,
+          useObjectStates: false
+        })
+
+        this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
+            projection: "perspective", // Perspective projection
+            duration: 2.0,       // 2.5 second transition
+            fitFOV: 65,
+            done: () => {
+                this.viewer.cameraControl.planView = true; // Disable rotation
+            }
+        })
       },
 
       addMesh () {
@@ -273,5 +274,12 @@
 #myCanvas {
   width: 100%;
   height: 400px;
+}
+.wrapper {
+  overflow: auto;
+}
+.storeys {
+  display: flex;
+  justify-content: stretch;
 }
 </style>
