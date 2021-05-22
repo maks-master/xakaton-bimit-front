@@ -76,7 +76,7 @@ export default new Vuex.Store({
 
   actions: {
     async getDevices ({ commit }) {
-      let url = 'http://192.168.1.79:8080/xakaton/devices'
+      let url = host+'/devices'
       let response = await fetch(url)
       let json = await response.json()
 
@@ -84,7 +84,7 @@ export default new Vuex.Store({
     },
 
     async getAlarms ({ commit, dispatch, state }) {
-      let url = `http://192.168.1.25:8080/xakaton/device/${state.sensorType}/alarms`
+      let url = `${host}/device/${state.sensorType}/alarms`
       if (lastTime) {
         url += `/${lastTime}`
       }
@@ -103,7 +103,7 @@ export default new Vuex.Store({
     },
 
     async getDeviceStates ({ commit, dispatch }) {
-      let url = `http://192.168.1.25:8080/xakaton/model/devices/state`
+      let url = `${host}/model/devices/state`
       let response = await fetch(url)
       let json = await response.json()
 
@@ -118,7 +118,7 @@ export default new Vuex.Store({
 
     async saveDevice ({ commit }, device) {
       let response = await fetch(
-        'http://192.168.1.25:8080/xakaton/devices', 
+        host+'/xakaton/devices', 
         {method: 'PUT',headers: {'Content-Type': 'application/json;charset=utf-8'},
         body: JSON.stringify(device)
       })

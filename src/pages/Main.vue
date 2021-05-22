@@ -194,9 +194,6 @@
         this.model.on("loaded", () => {
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
-          
-
-          console.log(this.hitHelper)
 
           this.viewer.cameraFlight.flyTo(this.model)
           // this.viewer.cameraFlight.flyTo({ fit: true })
