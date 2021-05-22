@@ -92,6 +92,7 @@ export default {
   computed: {
     ...mapState(['deviceToEdit','deviceDataToSave']),
     ...mapGetters(['devices']),
+
     assignedDevices(){
       return this.devices.filter(d => d.elementId && d.position)
     },
