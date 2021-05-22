@@ -3,18 +3,24 @@
   .wrapper
     canvas#myCanvas
     
-    .storeys-wrapper( v-if="!current" )
+    .storeys-wrapper
       .storeys
-        storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
+        storey-view( 
+          v-for="s in storeys" 
+          :key="s.storeyMap.storeyId" 
+          :storeyMap="s.storeyMap" 
+          :name="s.name" 
+          :selected="current && current.storeyMap.storeyId == s.storeyMap.storeyId" 
+          @click.native="onStoreyClick(s)" 
+          )
     
-    //- vue-timeline.timeline( :data="events" )
     timeline.timeline( :data="events" )
 
-    .main-plan( v-if="current" )
-      storey-view( :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
-      v-btn( @click="onCancelStorey" ) cancel
+    v-card.main-plan( v-if="current" )
+      storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @click.native="onPlanClick" )
+      v-btn.main-plan__close( fab small @click="onCancelStorey" ) X
 
-    .buttons( v-if="!current" )
+    .buttons
       v-tooltip( right open-delay=300)
         template( v-slot:activator="{ on, attrs }" )
           v-btn( width="40" height="50" tile v-on="on" )
@@ -64,12 +70,9 @@
   import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
 
   import StoreyView from '@/components/StoreyView'
-  
+  import Timeline from "@/components/Timeline"  
 
   import { mapState, mapGetters, mapMutations } from 'vuex'
-
-  // import VueTimeline from "vue-timeline-component"
-  import Timeline from "@/components/Timeline"
 
   const worldPos = math.vec3();
 
@@ -78,30 +81,38 @@
     components: {
       StoreyView,
       Timeline,
-      // VueTimeline,
     },
 
     data: () => ({
       panel: [],
       storeys: [],
       current: null,
-      // events: [],
-      events: [{
-        name: "",
-        start: new Date(2021, 5,21),
-        end: new Date(2021, 5,22),
-        uuid: "123",
-      },{
-        name: "",
-        start: new Date(2021, 5,19),
-        end: new Date(2021, 5,22),
-        uuid: "abs",
-      },{
-        name: "",
-        start: new Date(2021, 5,15),
-        end: new Date(2021, 5,18),
-        uuid: "qwerty",
-      }]
+      events: [
+        {
+          name: "",
+          start: new Date(2021, 4, 21),
+          end: new Date(2021, 4, 25),
+          uuid: "123",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 19),
+          end: new Date(2021, 4, 24),
+          uuid: "abs",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 15),
+          end: new Date(2021, 4, 18),
+          uuid: "qwerty",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 22),
+          end: new Date(2021, 4, 23),
+          uuid: "qwerty",
+        }
+      ]
     }),
 
     watch: {
@@ -125,22 +136,6 @@
           this.addDevice(device)
         })
         this.buildStoreyMapsMenu()
-
-        // var now = new Date()
-        // var end = new Date()
-        // end.setSeconds(end.getSeconds() + 1);
-
-        // let create = () => {
-          
-        //   setTimeout(() => {
-        //     this.events.push({
-        //       start: now,
-        //       end: end,
-        //       uuid: "new",
-        //     })  
-        //   }, 3000);
-        // }
-        // create()
       },
 
       init() {
@@ -180,12 +175,11 @@
         this.storeyViewsPlugin = new StoreyViewsPlugin(this.viewer)
 
         this.model.on("loaded", () => {
-          console.log('model loaded')
-          // this.addMesh()
           this.viewer.cameraFlight.flyTo(this.model)
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
           this.$store.dispatch('getDevices')
+          this.$store.dispatch('getAlarms')
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -221,19 +215,20 @@
       },
 
       buildStoreyMapsMenu() {
-        this.cameraMemento = new CameraMemento() // Saves 3D perspective camera to restore
+        this.cameraMemento = new CameraMemento()
         this.cameraMemento.saveCamera(this.viewer.scene)
 
-        this.objectsMemento = new ObjectsMemento();
+        this.objectsMemento = new ObjectsMemento()
+        this.objectsMemento.saveObjects(this.viewer.scene)
 
         const storeyIds = Object.keys(this.storeyViewsPlugin.storeys);
 
         // eslint-disable-next-line
-        const canStandOnTypes = { // IFC types we can stand on in first-person mode
-            IfcSlab: true,
-            IfcStair: true,
-            IfcFloor: true,
-            IfcFooting: true
+        const canStandOnTypes = {
+          IfcSlab: true,
+          IfcStair: true,
+          IfcFloor: true,
+          IfcFooting: true
         };
 
         for (var i = 0, len = storeyIds.length; i < len; i++) {
@@ -241,9 +236,9 @@
             const storeyId = storeyIds[i];
 
             const storeyMap = this.storeyViewsPlugin.createStoreyMap(storeyId, {
-                format: "png",
-                width: 200,
-                useObjectStates: true
+              format: "png",
+              width: 200,
+              useObjectStates: true
             });
 
             let metaObject = this.viewer.metaScene.metaObjects[storeyId]
@@ -324,8 +319,8 @@
         let { storeyMap } = storey
         console.log(storeyMap.storeyId)
 
-        this.cameraMemento.saveCamera(this.viewer.scene)
-        this.objectsMemento.saveObjects(this.viewer.scene)
+        // this.cameraMemento.saveCamera(this.viewer.scene)
+        // this.objectsMemento.saveObjects(this.viewer.scene)
 
         this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
           hideOthers: true,
@@ -333,13 +328,13 @@
         })
 
         this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
-          projection: "ortho",
-          // projection: "perspective", // Perspective projection
+          // projection: "ortho",
+          projection: "perspective", // Perspective projection
           duration: 2.0,       // 2.5 second transition
-          fitFOV: 65,
-          done: () => {
-            this.viewer.cameraControl.planView = true; // Disable rotation
-          }
+          // fitFOV: 65,
+          // done: () => {
+          //   this.viewer.cameraControl.planView = true; // Disable rotation
+          // }
         })
 
         this.current = storey
@@ -372,11 +367,12 @@
           })
         } else {
           this.storeyViewsPlugin.gotoStoreyCamera(this.current.storeyMap.storeyId, {
-            projection: "ortho",
+            // projection: "ortho",
+            projection: "perspective",
             duration: 1.5,
-            done: () => {
-              this.viewer.cameraControl.navMode = "planView"
-            }
+            // done: () => {
+            //   this.viewer.cameraControl.navMode = "planView"
+            // }
           })
         }
       },
@@ -530,34 +526,45 @@
 
 <style scoped>
 .wrapper {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 #myCanvas {
   width: 100%;
-  height: 400px;
+  /* height: 400px; */
+  height: calc(100% - 77px - 162px - 2 * 10px);
+  /* flex: 1 1 auto; */
 }
 .storeys-wrapper {
   overflow: auto;
-  flex: 1 1 auto;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  /* height: 182px; */
 }
 .storeys {
   display: flex;
   justify-content: stretch;
 }
-.timeline {
-  flex: 1 1 auto;
-}
+/* .timeline {
+  height: 77px;
+} */
 .main-plan {
   position: absolute;
-  left: 10px;
+  right: 20px;
   top: 60px;
-  margin-top: 20px;
+  padding: 20px;
   overflow-y: hidden;
   height: auto;
   pointer-events: all;
   width: auto;
   user-select: none;
+  overflow: visible;
+}
+.main-plan__close {
+  position: absolute;
+  top: -15px;
+  right: -15px;
 }
 .buttons {
   display: flex;

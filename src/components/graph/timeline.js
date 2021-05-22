@@ -77,10 +77,11 @@ export default (config) => {
         .call(events({
           timeScale,
           onEventClick,
+          height,
         }))
         .call(axis({
           timeScale,
-          height
+          height,
         }))
         .call(cursor({
           showCursor,

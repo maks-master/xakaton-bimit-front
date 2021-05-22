@@ -5,6 +5,7 @@
 <script>
 import * as d3 from 'd3'
 import timeline from '@/components/graph/timeline'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -19,8 +20,12 @@ export default {
     }
   },
 
+  computed: {
+    ...mapGetters(['alarms']),
+  },
+
   watch: {
-    data () {
+    alarms () {
       this.reinstall()
     }
   },
@@ -31,16 +36,16 @@ export default {
 
   methods: {
     reinstall () {
-      this.preparedList = [...this.data]
+      this.preparedList = this.alarms.map(({ startTime, endTime, uuid }) => ({ uuid, start: new Date(startTime), end: new Date(endTime) }))
 
       d3.select('#timeline')
       .datum(this.preparedList)
       .call(timeline({
         widthResizable: true,
-        viewHeight: 150,
+        viewHeight: 70,
         margin: {
-          top: -150,
-          bottom: 30,
+          top: 0,
+          bottom: 25,
           left: 25,
           right: 25
         },
