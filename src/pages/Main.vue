@@ -7,7 +7,8 @@
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
     
-    vue-timeline.timeline( :data="events" )
+    //- vue-timeline.timeline( :data="events" )
+    timeline.timeline( :data="events" )
 
     .main-plan( v-if="current" )
       storey-view( :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
@@ -49,15 +50,17 @@
 
   import { mapGetters } from 'vuex'
 
-  import VueTimeline from "vue-timeline-component"
+  // import VueTimeline from "vue-timeline-component"
+  import Timeline from "@/components/Timeline"
 
   const worldPos = math.vec3();
 
   export default {
 
     components: {
-      StoreyView, 
-      VueTimeline,
+      StoreyView,
+      Timeline,
+      // VueTimeline,
     },
 
     data: () => ({
@@ -68,14 +71,17 @@
         name: "event 1",
         start: new Date(2020, 1,1),
         end: new Date(2020, 1,4),
+        uuid: "123",
       },{
         name: "event 2",
         start: new Date(2020, 1,2),
         end: new Date(2020, 1,5),
+        uuid: "abs",
       },{
         name: "event 3",
         start: new Date(2020, 1,3),
         end: new Date(2020, 1,10),
+        uuid: "qwerty",
       }]
     }),
 
