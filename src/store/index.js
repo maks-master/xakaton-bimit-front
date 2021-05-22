@@ -34,7 +34,8 @@ export default new Vuex.Store({
 
   getters: {
     devices: ({ devices }) => devices || [],
-    alarms: ({ alarms }) => alarms || []
+    alarms: ({ alarms }) => alarms || [],
+    storeyAlarms: ({ deviceStates }) => deviceStates.filter(i => i.alarm).map(i => i.alarm),
   },
 
   mutations: {
