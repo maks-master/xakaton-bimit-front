@@ -99,7 +99,7 @@ export default new Vuex.Store({
 
       setTimeout(() => {
         dispatch('getAlarms')
-      }, 400)
+      }, 500)
     },
 
     async getDeviceStates ({ commit, dispatch }) {

@@ -86,8 +86,8 @@
     },
 
     computed: {
-      ...mapState(['devicesEditMode', 'deviceToEdit', 'deviceEditDialog', 'sensorType']),
-      ...mapGetters(['devices', 'deviceStates']),
+      ...mapState(['devicesEditMode', 'deviceToEdit', 'deviceEditDialog', 'sensorType', 'deviceStates']),
+      ...mapGetters(['devices']),
 
       sensors () {
         return [
@@ -116,15 +116,13 @@
           console.log(device);
           console.log(object);
 
-          // this.viewer.cameraFlight.flyTo(node)
+          // this.viewer.cameraFlight.flyTo({ component: object, fitFOV: 75 })
 
           let { x, y, z } = device.cameraPosition
           this.viewer.camera.eye = [x, y, z]
           this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
           
-          let ids = this.viewer.scene.visibleObjectIds
-          this.viewer.scene.setObjectsHighlighted(ids, false)
-          this.viewer.scene.setObjectsHighlighted([device.uuid], true)
+          object.selected = true
         }
       },
 
