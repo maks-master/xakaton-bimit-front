@@ -5,16 +5,23 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    devices: []
+    devices: [],
+    assignedDevices: [],
+    notAssignedDevices: []
   },
 
   getters: {
-    devices: ({ devices }) => devices || []
+    devices: ({ devices }) => devices || [],
+    assignedDevices: ({ assignedDevices }) => assignedDevices || [],
+    notAssignedDevices: ({ notAssignedDevices }) => notAssignedDevices || []
   },
 
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
       state.devices = devices
+
+      state.assignedDevices = devices.filter(d => d.elementId && d.position)
+      state.notAssignedDevices = devices.filter(d => !d.elementId && !d.position)
     },
   },
 
