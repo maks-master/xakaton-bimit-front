@@ -2,7 +2,7 @@
   v-app
     v-app-bar
     v-main 
-      
+      router-view
     v-footer(padless)
 </template>
 
