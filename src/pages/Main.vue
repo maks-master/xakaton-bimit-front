@@ -18,7 +18,7 @@
     timeline.timeline( @click="onEventClick" )
 
     v-card.main-plan( v-if="current" )
-      storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @click.native="onPlanClick" )
+      storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @imageclick="onPlanClick" )
       v-btn.main-plan__close( fab small @click="onCancelStorey" ) X
 
     .buttons
@@ -295,8 +295,8 @@
         this.current = storey
       },
 
-      onPlanClick (e) {
-        const imagePos = [e.offsetX, e.offsetY]
+      onPlanClick (imagePos) {
+        // const imagePos = [event.offsetX, event.offsetY]
         
         const pickResult = this.storeyViewsPlugin.pickStoreyMap(this.current.storeyMap, imagePos, {
           pickSurface: true
