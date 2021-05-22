@@ -2,7 +2,7 @@
   .ma-2
     div( :class="{ 'selected': selected }" ) {{ name }}
     .wrapper( :style="wrapperStyle" )
-      img.storey( :src="storeyMap.imageData" :style="imgStyle" )
+      img.storey( :src="storeyMap.imageData" :style="imgStyle" @click="onImageClick" )
 </template>
 
 <script>
@@ -20,17 +20,30 @@ export default {
   },
 
   computed: {
+    size () {
+      let aspectRatio = this.storeyMap.width / this.storeyMap.height
+      let width = aspectRatio >= 1 ? this.maxSize : this.maxSize * aspectRatio
+      let height = aspectRatio >= 1 ? this.maxSize / aspectRatio : this.maxSize
+      return { width, height }
+    },
+
     wrapperStyle () {
       return `width: ${12 + +this.maxSize}px; height: ${12 + +this.maxSize}px;`
     },
 
     imgStyle () {
-      let aspectRatio = this.storeyMap.width / this.storeyMap.height
-      let width = aspectRatio >= 1 ? this.maxSize : this.maxSize * aspectRatio
-      let height = aspectRatio >= 1 ? this.maxSize / aspectRatio : this.maxSize
-      
+      let { width, height } = this.size
       return `align-self: center; width: ${width}px; height: ${height}px;`
     },
+  },
+
+  methods: {
+    onImageClick (event) {
+      let x = event.offsetX * this.storeyMap.width / this.size.width
+      let y = event.offsetY * this.storeyMap.height / this.size.height
+
+      this.$emit('imageclick', [x, y])
+    }
   }
 }
 </script>

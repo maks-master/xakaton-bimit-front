@@ -18,7 +18,7 @@
     timeline.timeline( @click="onEventClick" )
 
     v-card.main-plan( v-if="current" )
-      storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @click.native="onPlanClick" )
+      storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @imageclick="onPlanClick" )
       v-btn.main-plan__close( fab small @click="onCancelStorey" ) X
 
     .buttons
@@ -129,6 +129,14 @@
 
       onSwicth (type) {
         this.switchSensors(type)
+
+        this.devices.forEach(device => {
+          let object = this.deviceMeshes.find(d => d.id == device.uuid)
+          if (object) {
+            let { deviceType } = device
+            object.visible = deviceType && deviceType.value == this.sensorType
+          }
+        })
       },
 
       onDeviceStatesUpdate () {
@@ -146,6 +154,7 @@
         this.devices.forEach(device => {
           this.addDevice(device)
         })
+        this.onSwicth(SensorType.TEMPERATURE)
         this.buildStoreyMapsMenu()
       },
 
@@ -293,13 +302,14 @@
         this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
           projection: "perspective",
           duration: 2.0,
+          fitFOV: 50,
         })
 
         this.current = storey
       },
 
-      onPlanClick (e) {
-        const imagePos = [e.offsetX, e.offsetY]
+      onPlanClick (imagePos) {
+        // const imagePos = [event.offsetX, event.offsetY]
         
         const pickResult = this.storeyViewsPlugin.pickStoreyMap(this.current.storeyMap, imagePos, {
           pickSurface: true
@@ -333,25 +343,26 @@
       },
 
       addDevice (device) {
-
-        if (device.elementId && device.position){
+        if (device.elementId && device.position) {
+          let { deviceType } = device
+          let visible = deviceType && deviceType.value == this.sensorType
 
           let n = new Node(this.model, {
-                id: device.uuid,
-                pickable: false,
-                visible: true,
-                position: [device.position.x, device.position.y, device.position.z],
+            id: device.uuid,
+            pickable: false,
+            visible,
+            position: [device.position.x, device.position.y, device.position.z],
 
-                children: [
-                    new Mesh(this.model, {
-                        geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
-                        material: new PhongMaterial(this.viewer.scene, {emissive: [0, 1, 0], diffuse: [0, 0, 0]}),
-                        pickable: false
-                    })
-                ]
-            });
+            children: [
+              new Mesh(this.model, {
+                geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
+                material: new PhongMaterial(this.viewer.scene, {emissive: [0, 1, 0], diffuse: [0, 0, 0]}),
+                pickable: false
+              })
+            ]
+          });
 
-            this.deviceMeshes.push(n);
+          this.deviceMeshes.push(n);
         }
       },
 
