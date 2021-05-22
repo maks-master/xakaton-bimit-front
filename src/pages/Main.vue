@@ -3,6 +3,7 @@
   div
     canvas#myCanvas
     div#storeys
+    v-btn( @click="onCancelStorey" ) cancel
 
 </template>
 
@@ -11,7 +12,8 @@
   import { XKTLoaderPlugin } from '@xeokit/xeokit-sdk/src/plugins/XKTLoaderPlugin/XKTLoaderPlugin.js'
 
   import {Mesh, Node, PhongMaterial, buildBoxGeometry, ReadableGeometry} from "@xeokit/xeokit-sdk/src/viewer/scene"
-  import { StoreyViewsPlugin, math, CameraMemento } from "@xeokit/xeokit-sdk"
+  // eslint-disable-next-line
+  import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
 
   export default {
     data: () => ({
@@ -58,12 +60,15 @@
       },
 
       buildStoreyMapsMenu() {
-        const cameraMemento = new CameraMemento() // Saves 3D perspective camera to restore
-        cameraMemento.saveCamera(this.viewer.scene)
+        this.cameraMemento = new CameraMemento() // Saves 3D perspective camera to restore
+        this.cameraMemento.saveCamera(this.viewer.scene)
+
+        this.objectsMemento = new ObjectsMemento();
 
         const storeyDiv = document.getElementById("storeys")
         const storeyIds = Object.keys(this.storeyViewsPlugin.storeys);
 
+        // eslint-disable-next-line
         const canStandOnTypes = { // IFC types we can stand on in first-person mode
             IfcSlab: true,
             IfcStair: true,
@@ -81,6 +86,7 @@
                 useObjectStates: true
             });
 
+
             const img = document.createElement("img");
             img.src = storeyMap.imageData;
             img.style.border = "1px solid #000000";
@@ -91,69 +97,94 @@
 
             storeyDiv.appendChild(img);
 
-            img.onmouseenter = () => {
-                img.style.cursor = "default";
-            };
+            img.onclick = () => {
+              console.log(storeyMap.storeyId);
+              this.cameraMemento.saveCamera(this.viewer.scene)
+              this.objectsMemento.saveObjects(this.viewer.scene)
 
-            img.onmousemove = (e) => {
-                img.style.cursor = "default";
-                const imagePos = [e.offsetX, e.offsetY];
-                const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {});
-                if (pickResult) {
-                    const entity = pickResult.entity;
-                    const metaObject = this.viewer.metaScene.metaObjects[entity.id];
-                    if (metaObject) {
-                        if (canStandOnTypes[metaObject.type]) {
-                            img.style.cursor = "pointer";
-                        }
-                    }
-                }
-            };
+              this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
+                hideOthers: true,
+                useObjectStates: false
+              });
 
-            img.onmouseleave = () => {
-                img.style.cursor = "default";
-            };
+              this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
+                  projection: "perspective", // Perspective projection
+                  duration: 2.0,       // 2.5 second transition
+                  fitFOV: 65,
+                  done: () => {
+                      this.viewer.cameraControl.planView = true; // Disable rotation
+                  }
+              });
+            }
 
-            const worldPos = math.vec3();
+            // img.onmouseenter = () => {
+            //     img.style.cursor = "default";
+            // };
 
-            img.onclick = (e) => {
+            // img.onmousemove = (e) => {
+            //     img.style.cursor = "default";
+            //     const imagePos = [e.offsetX, e.offsetY];
+            //     const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {});
+            //     if (pickResult) {
+            //         const entity = pickResult.entity;
+            //         const metaObject = this.viewer.metaScene.metaObjects[entity.id];
+            //         if (metaObject) {
+            //             if (canStandOnTypes[metaObject.type]) {
+            //                 img.style.cursor = "pointer";
+            //             }
+            //         }
+            //     }
+            // };
 
-                const imagePos = [e.offsetX, e.offsetY];
+            // img.onmouseleave = () => {
+            //     img.style.cursor = "default";
+            // };
 
-                const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {
-                    pickSurface: true
-                });
+            // const worldPos = math.vec3();
 
-                if (pickResult) {
+            // img.onclick = (e) => {
 
-                    worldPos.set(pickResult.worldPos);
+            //     const imagePos = [e.offsetX, e.offsetY];
 
-                    // Set camera vertical position at the mid point of the storey's vertical
-                    // extents - note how this is adapts to whichever of the X, Y or Z axis is
-                    // designated the World's "up" axis
+            //     const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {
+            //         pickSurface: true
+            //     });
 
-                    const camera = this.viewer.scene.camera;
-                    const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2); // Find the right axis for "up"
-                    const storey = this.storeyViewsPlugin.storeys[storeyMap.storeyId];
-                    worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2;
+            //     if (pickResult) {
 
-                    this.viewer.cameraFlight.flyTo({
-                        eye: worldPos,
-                        up: this.viewer.camera.worldUp,
-                        look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
-                        projection: "perspective",
-                        duration: 1.5
-                    }, () => {
-                        this.viewer.cameraControl.navMode = "firstPerson";
-                        this.viewer.cameraControl.followPointer = false;
-                    });
-                } else {
-                    cameraMemento.restoreCamera(this.viewer.scene, () => {
-                        this.viewer.cameraControl.navMode = "planView";
-                    });
-                }
-            };
+            //         worldPos.set(pickResult.worldPos);
+
+            //         // Set camera vertical position at the mid point of the storey's vertical
+            //         // extents - note how this is adapts to whichever of the X, Y or Z axis is
+            //         // designated the World's "up" axis
+
+            //         const camera = this.viewer.scene.camera;
+            //         const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2); // Find the right axis for "up"
+            //         const storey = this.storeyViewsPlugin.storeys[storeyMap.storeyId];
+            //         worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2;
+
+            //         this.viewer.cameraFlight.flyTo({
+            //             eye: worldPos,
+            //             up: this.viewer.camera.worldUp,
+            //             look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
+            //             projection: "perspective",
+            //             duration: 1.5
+            //         }, () => {
+            //             this.viewer.cameraControl.navMode = "firstPerson";
+            //             this.viewer.cameraControl.followPointer = false;
+            //         });
+            //     } else {
+            //         cameraMemento.restoreCamera(this.viewer.scene, () => {
+            //             this.viewer.cameraControl.navMode = "planView";
+            //         });
+            //     }
+            // };
         }
+      },
+
+      onCancelStorey () {
+        this.cameraMemento.restoreCamera(this.viewer.scene)
+        this.objectsMemento.restoreObjects(this.viewer.scene)
       },
 
       addMesh () {
