@@ -9,6 +9,8 @@ export default (config) => selection => {
 
   let now = timeScale(Date.now())
 
+  if (!now) return
+
   let cursor = selection.selectAll('.cursor').data(d => d)
 
   let g = cursor.enter()
