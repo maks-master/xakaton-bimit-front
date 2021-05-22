@@ -6,7 +6,7 @@
 </template>
 
 <script>
-const maxStoreySize = 150
+const maxStoreySize = 110
 
 export default {
   props: {

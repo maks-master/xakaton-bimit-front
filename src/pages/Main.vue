@@ -7,13 +7,14 @@
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
     
-    vue-timeline.timeline( :data="events" )
+    //- vue-timeline.timeline( :data="events" )
+    timeline.timeline( :data="events" )
 
     .main-plan( v-if="current" )
       storey-view( :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
       v-btn( @click="onCancelStorey" ) cancel
 
-    .buttons
+    .buttons( v-if="!current" )
       v-tooltip( right open-delay=300)
         template( v-slot:activator="{ on, attrs }" )
           v-btn( width="40" height="50" tile v-on="on" )
@@ -49,34 +50,39 @@
 
   import { mapState, mapGetters } from 'vuex'
 
-  import VueTimeline from "vue-timeline-component"
+  // import VueTimeline from "vue-timeline-component"
+  import Timeline from "@/components/Timeline"
 
   const worldPos = math.vec3();
 
   export default {
 
     components: {
-      StoreyView, 
-      VueTimeline,
+      StoreyView,
+      Timeline,
+      // VueTimeline,
     },
 
     data: () => ({
       panel: [],
       storeys: [],
       current: null,
-
+      // events: [],
       events: [{
-        name: "event 1",
-        start: new Date(2020, 1,1),
-        end: new Date(2020, 1,4),
+        name: "",
+        start: new Date(2021, 5,21),
+        end: new Date(2021, 5,22),
+        uuid: "123",
       },{
-        name: "event 2",
-        start: new Date(2020, 1,2),
-        end: new Date(2020, 1,5),
+        name: "",
+        start: new Date(2021, 5,19),
+        end: new Date(2021, 5,22),
+        uuid: "abs",
       },{
-        name: "event 3",
-        start: new Date(2020, 1,3),
-        end: new Date(2020, 1,10),
+        name: "",
+        start: new Date(2021, 5,15),
+        end: new Date(2021, 5,18),
+        uuid: "qwerty",
       }]
     }),
 
@@ -95,12 +101,27 @@
     },
 
     methods: {
-
       onDeviceUpdate () {
         this.devices.forEach(device => {
           this.addDevice(device)
         })
         this.buildStoreyMapsMenu()
+
+        // var now = new Date()
+        // var end = new Date()
+        // end.setSeconds(end.getSeconds() + 1);
+
+        // let create = () => {
+          
+        //   setTimeout(() => {
+        //     this.events.push({
+        //       start: now,
+        //       end: end,
+        //       uuid: "new",
+        //     })  
+        //   }, 3000);
+        // }
+        // create()
       },
 
       init() {
@@ -110,12 +131,14 @@
           transparent: true,
           saoEnabled: true,
           pbrEnabled: true,
+          backfaces: true,
         })
 
         let objectDefaults = { 
           IfcSpace: { 
             pickable: false, 
-            opacity: 0.2
+            opacity: 0.2,
+            visible: false,
           },
           IfcWindow: {
             colorize: [0.2578125, 0.6953125, 0.84765625],
