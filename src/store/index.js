@@ -130,7 +130,7 @@ export default new Vuex.Store({
 
     async saveDevice ({ commit }, device) {
       let response = await fetch(
-        host+'/xakaton/devices', 
+        host+'/devices', 
         {method: 'PUT',headers: {'Content-Type': 'application/json;charset=utf-8'},
         body: JSON.stringify(device)
       })
