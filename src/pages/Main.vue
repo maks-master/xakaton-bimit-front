@@ -55,6 +55,7 @@
         this.devices.forEach(device => {
           this.addDevice(device)
         })
+        this.buildStoreyMapsMenu()
       },
 
       init() {
@@ -80,7 +81,7 @@
           // this.addMesh()
           this.viewer.cameraFlight.flyTo(this.model)
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
-          this.buildStoreyMapsMenu()
+          // this.buildStoreyMapsMenu()
           this.$store.dispatch('getDevices')
         })
 
@@ -219,11 +220,13 @@
 
       onPlanClick (e) {
         const imagePos = [e.offsetX, e.offsetY];
+        console.log("On pick");
         const pickResult = this.storeyViewsPlugin.pickStoreyMap(this.current.storeyMap, imagePos, {
-            pickSurface: true
+          pickSurface: true
         });
+        console.log("On pick 2");
         if (pickResult) {
-
+          console.log(pickResult);
             worldPos.set(pickResult.worldPos);
 
             // Set camera vertical position at the mid point of the storey's vertical
@@ -262,9 +265,13 @@
             zSize: 1
         }))
 
-        new Mesh(this.viewer.scene, {
+        new Mesh(this.model, {
           id: device.uuid,
-          isObject: true,
+          // isObject: true,
+          // isModel: true,
+          // isMesh: true,
+          // type: "Mesh",
+          // pickable: true,
           position: [device.position.x, device.position.y, device.position.z],
           scale: [1, 1, 1],
           rotation: [0, 0, 0],
@@ -276,14 +283,14 @@
 
         // new Node(this.viewer.scene, {
         //     id: device.uuid,
-        //     isModel: false,
+        //     isModel: true,
         //     rotation: [0, 0, 0],
         //     position: [device.position.x, device.position.y, device.position.z],
         //     scale: [1, 1, 1],
 
         //     children: [
         //       new Mesh(this.viewer.scene, {
-        //         id: "tableTop",
+        //         id: `${device.uuid}_mesh`,
         //         isObject: true,
         //         position: [0, 0, 0],
         //         scale: [1, 1, 1],
