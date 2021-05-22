@@ -2,9 +2,10 @@
 
   div
     canvas#myCanvas
-    .wrapper
+    storey-view.main-plan( v-if="current" :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
+    .wrapper( v-else )
       .storeys
-        storey-view( v-for="{ storeyMap, name } in storeys" :key="storeyMap.storeyId" :storeyMap="storeyMap" :name="name" @click.native="onStoreyClick(storeyMap)" )
+        storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
     v-btn( @click="onCancelStorey" ) cancel
 
 </template>
@@ -19,6 +20,8 @@
 
   import StoreyView from '@/components/StoreyView'
 
+  const worldPos = math.vec3();
+
   export default {
 
     components: {
@@ -26,7 +29,8 @@
     },
 
     data: () => ({
-      storeys: []
+      storeys: [],
+      current: null
     }),
 
     mounted () {
@@ -163,11 +167,13 @@
       },
 
       onCancelStorey () {
+        this.current = null
         this.cameraMemento.restoreCamera(this.viewer.scene)
         this.objectsMemento.restoreObjects(this.viewer.scene)
       },
 
-      onStoreyClick (storeyMap) {
+      onStoreyClick (storey) {
+        let { storeyMap } = storey
         console.log(storeyMap.storeyId)
 
         this.cameraMemento.saveCamera(this.viewer.scene)
@@ -179,13 +185,54 @@
         })
 
         this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
-            projection: "perspective", // Perspective projection
-            duration: 2.0,       // 2.5 second transition
-            fitFOV: 65,
-            done: () => {
-                this.viewer.cameraControl.planView = true; // Disable rotation
-            }
+          projection: "ortho",
+          // projection: "perspective", // Perspective projection
+          duration: 2.0,       // 2.5 second transition
+          fitFOV: 65,
+          done: () => {
+            this.viewer.cameraControl.planView = true; // Disable rotation
+          }
         })
+
+        this.current = storey
+      },
+
+      onPlanClick (e) {
+        const imagePos = [e.offsetX, e.offsetY];
+        const pickResult = this.storeyViewsPlugin.pickStoreyMap(this.current.storeyMap, imagePos, {
+            pickSurface: true
+        });
+        if (pickResult) {
+
+            worldPos.set(pickResult.worldPos);
+
+            // Set camera vertical position at the mid point of the storey's vertical
+            // extents - note how this is adapts to whichever of the X, Y or Z axis is
+            // designated the World's "up" axis
+
+            const camera = this.viewer.scene.camera;
+            const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2); // Find the right axis for "up"
+            const storey = this.storeyViewsPlugin.storeys[this.current.storeyMap.storeyId];
+            worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2;
+
+            this.viewer.cameraFlight.flyTo({
+                eye: worldPos,
+                up: this.viewer.camera.worldUp,
+                look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
+                projection: "perspective",
+                duration: 1.5
+            }, () => {
+              this.viewer.cameraControl.navMode = "firstPerson";
+            });
+        } else {
+          this.storeyViewsPlugin.gotoStoreyCamera(this.current.storeyMap.storeyId, {
+            projection: "ortho",
+            duration: 1.5,
+            done: () => {
+              this.viewer.cameraControl.navMode = "planView"
+            }
+          });
+        }
       },
 
       addMesh () {
@@ -281,5 +328,16 @@
 .storeys {
   display: flex;
   justify-content: stretch;
+}
+.main-plan {
+  position: absolute;
+  left: 10px;
+  top: 60px;
+  margin-top: 20px;
+  overflow-y: hidden;
+  height: auto;
+  pointer-events: all;
+  width: auto;
+  user-select: none;
 }
 </style>
