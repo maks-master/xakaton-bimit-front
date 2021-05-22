@@ -28,7 +28,8 @@ export default new Vuex.Store({
     alarms: [],
     sensorType: SensorType.TEMPERATURE,
 
-    deviceStates: []
+    deviceStates: [],
+    isActive: true,
   },
 
   getters: {
@@ -66,11 +67,16 @@ export default new Vuex.Store({
     SET_SENSOR_TYPE: (state, type) => {
       state.sensorType = type
       state.alarms = []
+      state.isActive = true
       lastTime = null
     },
 
     UPDATE_DEVICE_STATES: (state, states) => {
       state.deviceStates = states
+    },
+
+    SET_ACTIVITY: (state, active) => {
+      state.isActive = active
     }
   },
 
@@ -83,18 +89,24 @@ export default new Vuex.Store({
       commit('REPLACE_DEVICES', json)
     },
 
+    toggleActivity ({ commit }, active) {
+      commit('SET_ACTIVITY', active)
+    },
+
     async getAlarms ({ commit, dispatch, state }) {
-      let url = `${host}/device/${state.sensorType}/alarms`
-      if (lastTime) {
-        url += `/${lastTime}`
-      }
-
-      let response = await fetch(url)
-      let { time, alarms } = await response.json()
-
-      if (alarms && time) {
-        commit('ADD_ALARMS', alarms)
-        lastTime = time
+      if (state.isActive) {
+        let url = `${host}/device/${state.sensorType}/alarms`
+        if (lastTime) {
+          url += `/${lastTime}`
+        }
+  
+        let response = await fetch(url)
+        let { time, alarms } = await response.json()
+  
+        if (alarms && time) {
+          commit('ADD_ALARMS', alarms)
+          lastTime = time
+        }
       }
 
       setTimeout(() => {
