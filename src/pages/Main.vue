@@ -219,34 +219,30 @@
       },
 
       onPlanClick (e) {
-        const imagePos = [e.offsetX, e.offsetY];
-        console.log("On pick");
+        const imagePos = [e.offsetX, e.offsetY]
+        
         const pickResult = this.storeyViewsPlugin.pickStoreyMap(this.current.storeyMap, imagePos, {
           pickSurface: true
-        });
-        console.log("On pick 2");
+        })
+        
         if (pickResult) {
-          console.log(pickResult);
-            worldPos.set(pickResult.worldPos);
+          console.log(pickResult)
+          worldPos.set(pickResult.worldPos)
 
-            // Set camera vertical position at the mid point of the storey's vertical
-            // extents - note how this is adapts to whichever of the X, Y or Z axis is
-            // designated the World's "up" axis
+          const camera = this.viewer.scene.camera
+          const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2)
+          const storey = this.storeyViewsPlugin.storeys[this.current.storeyMap.storeyId]
+          worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2
 
-            const camera = this.viewer.scene.camera;
-            const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2); // Find the right axis for "up"
-            const storey = this.storeyViewsPlugin.storeys[this.current.storeyMap.storeyId];
-            worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2;
-
-            this.viewer.cameraFlight.flyTo({
-                eye: worldPos,
-                up: this.viewer.camera.worldUp,
-                look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
-                projection: "perspective",
-                duration: 1.5
-            }, () => {
-              this.viewer.cameraControl.navMode = "firstPerson";
-            });
+          this.viewer.cameraFlight.flyTo({
+              eye: worldPos,
+              up: this.viewer.camera.worldUp,
+              look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
+              projection: "perspective",
+              duration: 1.5
+          }, () => {
+            this.viewer.cameraControl.navMode = "firstPerson";
+          })
         } else {
           this.storeyViewsPlugin.gotoStoreyCamera(this.current.storeyMap.storeyId, {
             projection: "ortho",
@@ -254,7 +250,7 @@
             done: () => {
               this.viewer.cameraControl.navMode = "planView"
             }
-          });
+          })
         }
       },
 
@@ -267,10 +263,7 @@
 
         new Mesh(this.model, {
           id: device.uuid,
-          // isObject: true,
           // isModel: true,
-          // isMesh: true,
-          // type: "Mesh",
           // pickable: true,
           position: [device.position.x, device.position.y, device.position.z],
           scale: [1, 1, 1],
