@@ -1,9 +1,5 @@
 <template lang="pug">
-  v-app
-    v-app-bar
-    v-main 
-      router-view
-    v-footer(padless)
+  router-view
 </template>
 
 <script>

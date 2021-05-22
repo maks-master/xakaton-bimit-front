@@ -1,17 +1,31 @@
 <template lang="pug">
   div
-    | Датчики
-    device-list-item( v-for="d in devices" :key="d.uuid" :device="d" )
+    v-list-item
+      v-list-item-content
+        v-list-item-title Датчики
+
+    v-list(dense)
+      v-list-item(v-for="d in devices" :key="d.uuid" :device="d")
+        v-list-item-content
+          v-list-item-title {{ d.name }}
       
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import DeviceListItem from '@/components/DeviceListItem'
+
 
 export default {
   components: {
-    DeviceListItem
+    
+  },
+
+  data: () => ({
+    drawer:false
+  }),
+
+  mounted(){
+    
   },
 
   computed: {
