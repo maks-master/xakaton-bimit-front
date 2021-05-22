@@ -72,7 +72,7 @@
   import StoreyView from '@/components/StoreyView'
   import Timeline from "@/components/Timeline"  
 
-  import { mapState, mapGetters, mapMutations } from 'vuex'
+  import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
   const worldPos = math.vec3();
 
@@ -131,6 +131,7 @@
 
     methods: {
       ...mapMutations(['SET_DEVICE_TO_SAVE','SET_DEVICE_EDIT_DIALOG']),
+      ...mapActions(['saveDevice']),
       onDeviceUpdate () {
         this.devices.forEach(device => {
           this.addDevice(device)
@@ -378,20 +379,46 @@
       },
 
       addDevice (device) {
+        let object = this.viewer.scene.objects[device.elementId]
+        console.log(object);
+        //if (object)  this.viewer.scene.objects.removeChild(object)
+
         if (device.elementId && device.position){
-          // let object = this.viewer.metaScene.metaObjects[device.elementId]
-          // console.log(object);
+
+          // new Node(this.viewer.scene, {
+          //       id: device.uuid,
+          //       pickable: false,
+          //       visible: true,
+          //       position: [device.position.x, device.position.y, device.position.z],
+
+          //       children: [
+          //           new Mesh(this.viewer.scene, {
+          //               geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
+          //               material: new PhongMaterial(this.viewer.scene, {emissive: [1, 0, 0], diffuse: [0, 0, 0]}),
+          //               pickable: false
+          //           }),
+          //           new Mesh(this.viewer.scene, {
+          //               geometry: new VBOGeometry(this.viewer.scene, {
+          //                   primitive: "lines",
+          //                   positions: [
+          //                       0.0, 0.0, 0.0, 0.0, 0.0, -2.0
+          //                   ],
+          //                   indices: [0, 1]
+          //               }),
+          //               material: new PhongMaterial(this.viewer.scene, {emissive: [1, 1, 0], diffuse: [0, 0, 0], lineWidth: 4}),
+          //               pickable: false
+          //           })
+          //       ]
+          //   });
 
           const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
-              xSize: 1,
-              ySize: 1,
-              zSize: 1
+              xSize: .5,
+              ySize: .5,
+              zSize: .5
           }))
 
           new Mesh(this.model, {
             id: device.uuid,
-            // isModel: true,
-            // pickable: true,
             position: [device.position.x, device.position.y, device.position.z],
             scale: [1, 1, 1],
             rotation: [0, 0, 0],
@@ -426,14 +453,13 @@
       },
 
       bindEditMode(){
-        this.hitHelper.hide()
-        console.log(this.devicesEditMode)
         if (this.deviceToEdit && this.devicesEditMode) {
           if (!this.onMouseMove) this.bindMouseMove()
           this.viewer.scene.input.setEnabled(true);
         } else {
           this.viewer.scene.input.setEnabled(false);
         }
+        this.hitHelper.hide()
       },
 
       bindMouseMove(){
@@ -463,7 +489,7 @@
 
             this.node = new Node(viewer.scene, {
                 pickable: false,
-                visible: true,
+                visible: false,
                 position: [0, 0, 0],
 
                 children: [
@@ -515,8 +541,9 @@
       },
 
       saveEditSensor(){
-        console.log(this.deviceEditDialog)
-        console.log(this.deviceEditDialog.device)
+        this.saveDevice(this.deviceEditDialog.device)
+        this.cancelEditSensor()
+        this.hitHelper.hide();
       }
 
     }

@@ -32,6 +32,12 @@ export default new Vuex.Store({
       state.devices = devices
     },
 
+    UPDATE_DEVICE:(state, device) => {
+      state.devices.map(d => {
+        if (d.uuid == device.uuid) d = device
+      })
+    },
+
     SET_SENSORS_EDIT_MODE: (state, isEditMode) => {
       state.devicesEditMode = isEditMode
     },
@@ -77,6 +83,16 @@ export default new Vuex.Store({
       setTimeout(() => {
         dispatch('getAlarms')
       }, 400)
+    },
+
+    async saveDevice ({ commit }, device) {
+      let response = await fetch(
+        'http://192.168.1.25:8080/xakaton/devices', 
+        {method: 'PUT',headers: {'Content-Type': 'application/json;charset=utf-8'},
+        body: JSON.stringify(device)
+      })
+      let json = await response.json()
+      commit('UPDATE_DEVICE',json)
     },
 
   },
