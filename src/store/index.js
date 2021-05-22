@@ -35,7 +35,7 @@ export default new Vuex.Store({
     },
 
     async getAlarms () {
-      let url = 'http://192.168.1.25:8080/xakaton/device/2/alarms'
+      let url = 'http://192.168.1.25:8080/xakaton/device/0/alarms'
       let response = await fetch(url)
       let json = await response.json()
 
