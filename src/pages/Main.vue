@@ -84,13 +84,25 @@
           saoEnabled: false
         })
 
+        let objectDefaults = { 
+          IfcSpace: { 
+            pickable: false, 
+            opacity: 0.2
+          },
+          IfcWindow: {
+            colorize: [0.2578125, 0.6953125, 0.84765625],
+            opacity: 0.6
+          }
+        }
+
         this.xktLoader = new XKTLoaderPlugin(this.viewer);
 
         this.model = this.xktLoader.load({
           id: "myModel",
           src: "./model/scene.xkt",
           metaModelSrc: "./model/scene.json",
-          edges: true
+          edges: true,
+          objectDefaults: objectDefaults
         })
 
         this.storeyViewsPlugin = new StoreyViewsPlugin(this.viewer)
