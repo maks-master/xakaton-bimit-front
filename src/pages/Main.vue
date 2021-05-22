@@ -162,11 +162,10 @@
           backfaces: true,
         })
 
-        this.makeHelpMesh()
-
         this.viewer.camera.eye = [ -1, 1, 5 ]
         this.viewer.camera.look = [ -1, 0, 0 ]
         // this.viewer.camera.up = [ 0.25, 0.22, -0.94 ]
+        this.viewer.camera.projection = "perspective";
 
         let objectDefaults = { 
           IfcSpace: { 
@@ -195,9 +194,9 @@
         this.model.on("loaded", () => {
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
+          
 
-          this.makeHelpMesh()
-          this.hitHelper.hide()
+          console.log(this.hitHelper)
 
           this.viewer.cameraFlight.flyTo(this.model)
           // this.viewer.cameraFlight.flyTo({ fit: true })
@@ -207,6 +206,8 @@
           this.$store.dispatch('getDevices')
           this.$store.dispatch('getAlarms')
           this.$store.dispatch('getDeviceStates')
+
+          
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -357,6 +358,7 @@
 
       bindMouseMove(){
         let viewer = this.viewer
+        if (!this.hitHelper) this.makeHelpMesh()
         let hitHelper = this.hitHelper
         this.onMouseMove = viewer.scene.input.on("mousemove", function (coords) {
 
