@@ -174,8 +174,6 @@
         this.model.on("loaded", () => {
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
-          this.$store.dispatch('getDevices')
-          this.$store.dispatch('getAlarms')
 
           this.makeHelpMesh()
           this.hitHelper.hide()
@@ -184,6 +182,7 @@
           // this.viewer.cameraFlight.flyTo({ fit: true })
           // this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
+          
           this.$store.dispatch('getDevices')
           this.$store.dispatch('getAlarms')
           this.$store.dispatch('getDeviceStates')
