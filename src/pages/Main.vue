@@ -152,6 +152,8 @@
 
       init() {
         this.deviceMeshes = []
+        this.hitHelper = null
+
         this.viewer = new Viewer({
           canvasId: "myCanvas",
           transparent: true,
@@ -191,27 +193,25 @@
         this.storeyViewsPlugin = new StoreyViewsPlugin(this.viewer)
 
         this.model.on("loaded", () => {
+          this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
+          // this.buildStoreyMapsMenu()
+
+          this.makeHelpMesh()
+          this.hitHelper.hide()
+
           this.viewer.cameraFlight.flyTo(this.model)
           // this.viewer.cameraFlight.flyTo({ fit: true })
           // this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
+          
           this.$store.dispatch('getDevices')
           this.$store.dispatch('getAlarms')
           this.$store.dispatch('getDeviceStates')
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
-          console.log('‼️ Res pickResult:', pickResult)
-          console.log('‼️ Res pickResult._worldPos:', pickResult._worldPos)
-          console.log('‼️ Res pickResult.position:', pickResult.position)
-          console.log('‼️ Res pickResult.entity.id:', pickResult.entity.id)
-
           if (this.deviceToEdit && this.hitHelper && this.hitHelper.node.position) {
-            console.log('‼️ HELPER:', this.deviceToEdit)
-            console.log('‼️ HELPER:', this.hitHelper.node.position)
-console.log(this.deviceToEdit)
             let device_EDIT = JSON.parse(JSON.stringify(this.deviceToEdit))
-console.log(device_EDIT)
             if (!device_EDIT.position || device_EDIT.position == null) device_EDIT.position = {}
             device_EDIT.position.x = this.hitHelper.node.position[0]
             device_EDIT.position.y = this.hitHelper.node.position[1]
