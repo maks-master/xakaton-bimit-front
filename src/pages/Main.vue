@@ -104,6 +104,11 @@
     methods: {
       ...mapActions(['switchSensors','saveDevice']),
       ...mapMutations(['SET_DEVICE_TO_SAVE','SET_DEVICE_EDIT_DIALOG']),
+
+      onSwicth (type) {
+        this.switchSensors(type)
+      },
+
       onDeviceUpdate () {
         this.devices.forEach(device => {
           this.addDevice(device)
