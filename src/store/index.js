@@ -106,7 +106,7 @@ export default new Vuex.Store({
       commit('UPDATE_DEVICE',json)
     },
 
-    
+
     switchSensors({ commit }, sensorType) {
       commit('SET_SENSOR_TYPE', sensorType)
     }
