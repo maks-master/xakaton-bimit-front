@@ -3,11 +3,23 @@
     v-list-item
       v-list-item-content
         v-list-item-title Датчики
+        v-divider.my-2
+        
+        v-btn-toggle(v-model="toggle")
+          v-btn(icon small)
+            v-icon mdi-eye
+          v-btn(icon small)
+            v-icon mdi-cog-counterclockwise
+
+    
+    v-list-item(v-if="toggle == 1")
+      v-list-item-content Режим установки датчиков
+    
 
     v-divider
     v-list-item
       v-list-item-content
-        v-list-item-title Привязанные
+        v-list-item-subtitle Привязанные
     v-divider
 
     v-list(dense)
@@ -18,7 +30,7 @@
     v-divider.mb-2
     v-list-item
       v-list-item-content
-        v-list-item-title Не привязанные
+        v-list-item-subtitle Не привязанные
     v-divider
 
     v-list(dense)
@@ -29,7 +41,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 
 export default {
@@ -38,11 +50,19 @@ export default {
   },
 
   data: () => ({
-    drawer:false
+    drawer:false,
+    toggle:0
   }),
 
   mounted(){
     
+  },
+
+  watch: {
+    toggle(val){
+      if (val == 0) this.SET_SENSORS_EDIT_MODE(false)
+      if (val == 1) this.SET_SENSORS_EDIT_MODE(true)
+    }
   },
 
   computed: {
@@ -54,5 +74,10 @@ export default {
       return this.devices.filter(d => !d.elementId || !d.position)
     }
   },
+
+  methods: {
+    ...mapMutations(['SET_SENSORS_EDIT_MODE'])
+
+  }
 }
 </script>

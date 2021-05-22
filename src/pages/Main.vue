@@ -47,7 +47,7 @@
   import StoreyView from '@/components/StoreyView'
   
 
-  import { mapGetters } from 'vuex'
+  import { mapState, mapGetters } from 'vuex'
 
   import VueTimeline from "vue-timeline-component"
 
@@ -64,6 +64,7 @@
       panel: [],
       storeys: [],
       current: null,
+
       events: [{
         name: "event 1",
         start: new Date(2020, 1,1),
@@ -80,11 +81,13 @@
     }),
 
     watch: {
-      devices: 'onDeviceUpdate'
+      devices: 'onDeviceUpdate',
+      devicesEditMode: 'bindEditMode'
     },
 
     computed: {
-      ...mapGetters(['devices']),
+      ...mapState(['devicesEditMode']),
+      ...mapGetters(['devices'])
     },
 
     mounted () {
@@ -101,6 +104,7 @@
       },
 
       init() {
+        this.lastEntity = null
         this.viewer = new Viewer({
           canvasId: "myCanvas",
           transparent: true,
@@ -355,9 +359,41 @@
           //     ]
           // })
         }
+      },
+
+      bindEditMode(){
+        this.onMouseDown = null
+        let _self = this
+        if (this.devicesEditMode) {
+          this.onMouseDown = _self.viewer.scene.input.on("mousemove", function (coords) {
+              var hit = _self.viewer.scene.pick({
+                  canvasPos: coords
+              });
+
+              if (hit) {
+                  if (!_self.lastEntity || hit.entity.id !== _self.lastEntity.id) {
+                      if (_self.lastEntity) {
+                          _self.lastEntity.highlighted = false;
+                      }
+                      _self.lastEntity = hit.entity;
+                      hit.entity.highlighted = true;
+                  }
+              } else {
+                  if (_self.lastEntity) {
+                      _self.lastEntity.highlighted = false;
+                      _self.lastEntity = null;
+                  }
+              }
+          })
+        } else {
+          console.log('go in false')
+          _self.viewer.scene.input.off(_self.onMouseDown);
+          if (_self.viewer.scene.highlightedObjects.length > 0) _self.viewer.scene.highlightedObjects.map(e => e.highlighted = false)
+        }
       }
     }
   }
+
 </script>
 
 <style scoped>

@@ -6,22 +6,21 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     devices: [],
-    assignedDevices: [],
-    notAssignedDevices: []
+
+    devicesEditMode:false
   },
 
   getters: {
-    devices: ({ devices }) => devices || [],
-    assignedDevices: ({ assignedDevices }) => assignedDevices || [],
-    notAssignedDevices: ({ notAssignedDevices }) => notAssignedDevices || []
+    devices: ({ devices }) => devices || []
   },
 
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
       state.devices = devices
+    },
 
-      state.assignedDevices = devices.filter(d => d.elementId && d.position)
-      state.notAssignedDevices = devices.filter(d => !d.elementId && !d.position)
+    SET_SENSORS_EDIT_MODE: (state, isEditMode) => {
+      state.devicesEditMode = isEditMode
     },
   },
 
