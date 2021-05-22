@@ -10,6 +10,14 @@
     
     vue-timeline( :data="events" )
 
+    .buttons
+      v-tooltip(right open-delay=300)
+        template(v-slot:activator="{ on, attrs }")
+          v-btn.mt-4(small fab @click=" showOnlySelectedObjects()" :color="activeHideSelectedObjects ? '#3b93af' : '#262626'" v-on="on") 
+            v-icon.absolute(small) visibility
+            v-icon.absolute(large) crop_free
+        span Показать только выделенные элементы
+
 </template>
 
 <script>
@@ -344,5 +352,10 @@
   pointer-events: all;
   width: auto;
   user-select: none;
+}
+.buttons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 </style>
