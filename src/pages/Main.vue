@@ -14,30 +14,18 @@
           @click.native="onStoreyClick(s)" 
           )
     
-    timeline.timeline( :data="events" )
+    timeline.timeline
 
     v-card.main-plan( v-if="current" )
       storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @click.native="onPlanClick" )
       v-btn.main-plan__close( fab small @click="onCancelStorey" ) X
 
     .buttons
-      v-tooltip( right open-delay=300)
+      v-tooltip( v-for="(s, idx) in sensors" :key="s.icon" right open-delay=300)
         template( v-slot:activator="{ on, attrs }" )
-          v-btn( width="40" height="50" tile v-on="on" )
-            v-img( src="/icons/light_96px.png" height="48" contain )
-        span Показать только температурные датчики
-
-      v-tooltip( right open-delay=300)
-        template( v-slot:activator="{ on, attrs }" )
-          v-btn.mt-4( width="40" height="50" tile v-on="on" )
-            v-img( src="/icons/light_96px.png" height="48" contain )
-        span Показать только датчики освещения
-
-      v-tooltip( right open-delay=300)
-        template( v-slot:activator="{ on, attrs }" )
-          v-btn.mt-4( width="40" height="50" tile v-on="on" )
-            v-img( src="/icons/lightning_bolt_96px.png" height="48" contain )
-        span Показать только датчики напряжения
+          v-card.mt-4( :color="s.type == sensorType ? '#1DE9B6' : ''" width="50" height="50" v-on="on" @click="onSwicth(s.type)" )
+            v-img( :src="`/icons/${s.icon}.png`" height="48" aspect-ratio="1" contain )
+        span {{ s.tip }}
 
 </template>
 
@@ -54,7 +42,9 @@
   import StoreyView from '@/components/StoreyView'
   import Timeline from "@/components/Timeline"  
 
-  import { mapGetters } from 'vuex'
+  import { mapActions, mapGetters, mapState } from 'vuex'
+
+  import { SensorType } from '@/assets/enums'
 
   const worldPos = math.vec3();
 
@@ -69,32 +59,6 @@
       panel: [],
       storeys: [],
       current: null,
-      events: [
-        {
-          name: "",
-          start: new Date(2021, 4, 21),
-          end: new Date(2021, 4, 25),
-          uuid: "123",
-        },
-        {
-          name: "",
-          start: new Date(2021, 4, 19),
-          end: new Date(2021, 4, 24),
-          uuid: "abs",
-        },
-        {
-          name: "",
-          start: new Date(2021, 4, 15),
-          end: new Date(2021, 4, 18),
-          uuid: "qwerty",
-        },
-        {
-          name: "",
-          start: new Date(2021, 4, 22),
-          end: new Date(2021, 4, 23),
-          uuid: "qwerty",
-        }
-      ]
     }),
 
     watch: {
@@ -103,6 +67,15 @@
 
     computed: {
       ...mapGetters(['devices']),
+      ...mapState(['sensorType']),
+
+      sensors () {
+        return [
+          { type: SensorType.TEMPERATURE, icon: 'temperature_high_96px', tip: 'Показать только температурные датчики' },
+          { type: SensorType.LUMINOSITY, icon: 'light_96px', tip: 'Показать только датчики освещения' },
+          { type: SensorType.POWER, icon: 'lightning_bolt_96px', tip: 'Показать только датчики напряжения' },
+        ]
+      }
     },
 
     mounted () {
@@ -110,6 +83,13 @@
     },
 
     methods: {
+      ...mapActions(['switchSensors']),
+
+      onSwicth (type) {
+        console.log(type);
+        this.switchSensors(type)
+      },
+
       onDeviceUpdate () {
         this.devices.forEach(device => {
           this.addDevice(device)

@@ -8,12 +8,6 @@ import timeline from '@/components/graph/timeline'
 import { mapGetters } from 'vuex'
 
 export default {
-  props: {
-    data: {
-      type: Array
-    }
-  },
-
   data () {
     return {
       preparedList: []
