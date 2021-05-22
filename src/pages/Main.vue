@@ -11,11 +11,10 @@
     vue-timeline( :data="events" )
 
     .buttons
-      v-tooltip(right open-delay=300)
-        template(v-slot:activator="{ on, attrs }")
-          v-btn.mt-4(small fab @click=" showOnlySelectedObjects()" :color="activeHideSelectedObjects ? '#3b93af' : '#262626'" v-on="on") 
-            v-icon.absolute(small) visibility
-            v-icon.absolute(large) crop_free
+      v-tooltip( right open-delay=300)
+        template( v-slot:activator="{ on, attrs }" )
+          v-btn.mt-4( @click=" showOnlySelectedObjects()" color="#3b93af" v-on="on")
+            v-img( src="/public/icons/light_96px.png" width="40" height="40" )
         span Показать только выделенные элементы
 
 </template>
@@ -89,16 +88,25 @@
         this.viewer = new Viewer({
           canvasId: "myCanvas",
           transparent: true,
-          saoEnabled: false
+          saoEnabled: true,
+          pbrEnabled: true,
         })
 
-        this.xktLoader = new XKTLoaderPlugin(this.viewer);
+        let objectDefaults = {
+          IfcSpace: { 
+            pickable: true, 
+            opacity: 0.5
+          },
+        }
+
+        this.xktLoader = new XKTLoaderPlugin(this.viewer, { objectDefaults });
 
         this.model = this.xktLoader.load({
           id: "myModel",
           src: "./model/scene.xkt",
           metaModelSrc: "./model/scene.json",
-          edges: true
+          edges: true,
+          objectDefaults,
         })
 
         this.storeyViewsPlugin = new StoreyViewsPlugin(this.viewer)
