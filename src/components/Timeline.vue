@@ -30,7 +30,7 @@ export default {
 
   methods: {
     reinstall () {
-      this.preparedList = this.alarms.map(({ startTime, endTime, uuid }) => ({ uuid, start: new Date(startTime), end: new Date(endTime) }))
+      this.preparedList = this.alarms.map(({ startTime, endTime, uuid, deviceUuid }) => ({ uuid, deviceUuid, start: new Date(startTime), end: new Date(endTime) }))
 
       d3.select('#timeline')
       .datum(this.preparedList)
@@ -48,7 +48,7 @@ export default {
     },
 
     onClick (event) {
-      console.log(event);
+      this.$emit('click', event)
     }
   }
 }

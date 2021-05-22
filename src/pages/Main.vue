@@ -14,7 +14,7 @@
           @click.native="onStoreyClick(s)" 
           )
     
-    timeline.timeline
+    timeline.timeline( @click="onEventClick" )
 
     v-card.main-plan( v-if="current" )
       storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @click.native="onPlanClick" )
@@ -105,6 +105,19 @@
       ...mapActions(['switchSensors','saveDevice']),
       ...mapMutations(['SET_DEVICE_TO_SAVE','SET_DEVICE_EDIT_DIALOG']),
 
+      onEventClick (event) {
+        console.log(event);
+        console.log(this.viewer.camera);
+
+        let { deviceUuid } = event
+        let device = this.devices.find(item => item.uuid === deviceUuid)
+        if (device) {
+          let { x, y, z } = device.cameraPosition
+          this.viewer.camera.eye = [x, y, z]
+          this.viewer.camera.look = [device.position.x, device.position.y, device.position.z] 
+        }
+      },
+
       onSwicth (type) {
         this.switchSensors(type)
       },
@@ -127,6 +140,12 @@
           pbrEnabled: true,
           backfaces: true,
         })
+
+        this.makeHelpMesh()
+
+        this.viewer.camera.eye = [ -1, 1, 5 ]
+        this.viewer.camera.look = [ -1, 0, 0 ]
+        // this.viewer.camera.up = [ 0.25, 0.22, -0.94 ]
 
         let objectDefaults = { 
           IfcSpace: { 
@@ -162,6 +181,12 @@
           this.hitHelper.hide()
 
           this.viewer.cameraFlight.flyTo(this.model)
+          // this.viewer.cameraFlight.flyTo({ fit: true })
+          // this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
+          // this.buildStoreyMapsMenu()
+          this.$store.dispatch('getDevices')
+          this.$store.dispatch('getAlarms')
+          this.$store.dispatch('getDeviceStates')
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -331,11 +356,11 @@
           worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2
 
           this.viewer.cameraFlight.flyTo({
-              eye: worldPos,
-              up: this.viewer.camera.worldUp,
-              look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
-              projection: "perspective",
-              duration: 1.5
+            eye: worldPos,
+            up: this.viewer.camera.worldUp,
+            look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
+            projection: "perspective",
+            duration: 1.5
           }, () => {
             this.viewer.cameraControl.navMode = "firstPerson";
           })

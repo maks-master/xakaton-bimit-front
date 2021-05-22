@@ -96,6 +96,20 @@ export default new Vuex.Store({
       }, 400)
     },
 
+    async getDeviceStates ({ dispatch }) {
+      let url = `http://192.168.1.25:8080/xakaton/model/devices/state`
+      let response = await fetch(url)
+      let json = await response.json()
+
+      if (json) {
+        // commit('ADD_ALARMS', alarms)
+      }
+
+      setTimeout(() => {
+        dispatch('getDeviceStates')
+      }, 400)
+    },
+
     async saveDevice ({ commit }, device) {
       let response = await fetch(
         'http://192.168.1.25:8080/xakaton/devices', 
