@@ -20,6 +20,7 @@
             v-list-item(v-for="d in assignedDevices" :key="d.uuid")
               v-list-item-content
                 v-list-item-title {{ d.name }}
+                v-list-item-subtitle {{ dataBySensor(d) }}
 
           v-divider.mb-2
           v-list-item
@@ -86,11 +87,14 @@ export default {
       let sens = null
       if (val != null) sens = this.devices.find(d => d.uuid == val)
       this.SET_DEVICE_TO_EDIT(sens)
-    }
+    },
+    // deviceStates(val){
+
+    // }
   },
 
   computed: {
-    ...mapState(['deviceToEdit','deviceDataToSave']),
+    ...mapState(['deviceToEdit','deviceDataToSave','deviceStates']),
     ...mapGetters(['devices']),
 
     assignedDevices(){
@@ -110,6 +114,13 @@ export default {
         device:JSON.parse(JSON.stringify(d))
       }
       this.SET_DEVICE_EDIT_DIALOG(deviceEditDialog)
+    },
+
+    dataBySensor(d){
+      let out = ''
+      let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
+      if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
+      return out
     }
   }
 }

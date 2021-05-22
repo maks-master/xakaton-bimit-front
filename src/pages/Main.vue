@@ -270,7 +270,20 @@
 
       onStoreyClick (storey) {
         let { storeyMap } = storey
-        console.log(storeyMap.storeyId)
+
+        let metaObject = this.viewer.metaScene.metaObjects[storeyMap.storeyId]
+        console.log(metaObject)
+        console.log(this.devices)
+        console.log(this.deviceMeshes)
+
+        let devs = this.devices
+        //let sensorMeshes = this.deviceMeshes
+        metaObject.children.forEach(c => {
+          console.log(c.id)
+          let ss = devs.find(me => me.elementId = c.id)
+          console.log(ss.id)
+          console.log(ss.elementId)
+        })
 
         this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
           hideOthers: true,
@@ -449,7 +462,7 @@
         let element = this.viewer.metaScene.metaObjects[elementId]
         if (element.type == 'IfcBuildingStorey') return element
         let parent = element.parent
-        if (parent != null) this.findStoreyFromElement(parent.id)
+        if (parent != null) return this.findStoreyFromElement(parent.id)
         return null
       }
 
