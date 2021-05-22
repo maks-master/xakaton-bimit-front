@@ -45,7 +45,6 @@ export default {
         },
         onEventClick: this.onClick
       }))
-      console.log(this.data);
     },
 
     onClick (event) {

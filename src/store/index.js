@@ -15,25 +15,40 @@ let host = window.settings.server.url
 export default new Vuex.Store({
   state: {
     devices: [],
-    assignedDevices: [],
-    notAssignedDevices: [],
+
+    devicesEditMode:false,
+    deviceToEdit:null,
+
+    deviceEditDialog:{
+      show:false,
+      title:'',
+      device:null
+    },
+
     alarms: [],
     sensorType: SensorType.TEMPERATURE
   },
 
   getters: {
     devices: ({ devices }) => devices || [],
-    assignedDevices: ({ assignedDevices }) => assignedDevices || [],
-    notAssignedDevices: ({ notAssignedDevices }) => notAssignedDevices || [],
     alarms: ({ alarms }) => alarms || []
   },
 
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
       state.devices = devices
+    },
 
-      state.assignedDevices = devices.filter(d => d.elementId && d.position)
-      state.notAssignedDevices = devices.filter(d => !d.elementId && !d.position)
+    SET_SENSORS_EDIT_MODE: (state, isEditMode) => {
+      state.devicesEditMode = isEditMode
+    },
+
+    SET_DEVICE_TO_EDIT: (state, deviceToEdit) => {
+      state.deviceToEdit = deviceToEdit
+    },
+
+    SET_DEVICE_EDIT_DIALOG: (state, d) => {
+      state.deviceEditDialog = d
     },
 
     ADD_ALARMS: (state, alarms) => {
