@@ -284,7 +284,8 @@
         this.cameraMemento.restoreCamera(this.viewer.scene)
         this.objectsMemento.restoreObjects(this.viewer.scene)
 
-        this.deviceMeshes.map(m => m.visible = true)
+        //this.deviceMeshes.map(m => m.visible = true)
+        this.onSwicth(this.sensorType)
       },
 
       onStoreyClick (storey) {
@@ -300,8 +301,13 @@
         metaObject.children.forEach(c => {
           let ss = devs.find(me => me.elementId == c.id)
           if (ss) {
-            let ssmesh = sensorMeshes.find(sm => sm.id == ss.id)
-            if (ssmesh) ssmesh.visible = false
+            let ssmesh = sensorMeshes.find(sm => sm.id == ss.uuid)
+            if (ssmesh) {
+              console.log(ssmesh)
+              console.log(ssmesh.visible)
+              ssmesh.visible = true
+              console.log(ssmesh.visible)
+            }
           }
         })
 
