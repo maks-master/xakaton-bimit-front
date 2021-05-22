@@ -154,8 +154,6 @@
 
           if (object) {
             if (alarm) {
-              // let c = colors[alarm.alarmLevel.value].map(c => +c / 255)
-              // console.log(c);
               object.colorize = colors[alarm.alarmLevel.value].map(c => +c / 255)
             } 
             else {
@@ -387,7 +385,8 @@
             children: [
               new Mesh(this.model, {
                 geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
-                material: new PhongMaterial(this.viewer.scene, {emissive: [0, 1, 0], diffuse: [0, 0, 0]}),
+                // material: new PhongMaterial(this.viewer.scene, {emissive: [0, 0, 0], diffuse: [0, 0, 0]}),
+                material: new PhongMaterial(this.viewer.scene),
                 pickable: false
               })
             ]
