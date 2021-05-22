@@ -7,6 +7,7 @@
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
     v-btn( @click="onCancelStorey" ) cancel
+    device-list
 
 </template>
 
@@ -21,6 +22,7 @@
   import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
 
   import StoreyView from '@/components/StoreyView'
+  import DeviceList from '@/components/DeviceList'
 
   import { mapGetters } from 'vuex'
 
@@ -29,7 +31,8 @@
   export default {
 
     components: {
-      StoreyView
+      StoreyView, 
+      DeviceList,
     },
 
     data: () => ({
