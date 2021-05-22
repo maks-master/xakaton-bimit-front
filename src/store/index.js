@@ -32,7 +32,17 @@ export default new Vuex.Store({
       let json = await response.json()
 
       commit('REPLACE_DEVICES', json)
-    }
+    },
+
+    async getAlarms () {
+      let url = 'http://192.168.1.25:8080/xakaton/device/2/alarms'
+      let response = await fetch(url)
+      let json = await response.json()
+
+      console.log(json);
+      // commit('REPLACE_DEVICES', json)
+    },
+
   },
 
   modules: {

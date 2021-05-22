@@ -68,22 +68,32 @@
       storeys: [],
       current: null,
       // events: [],
-      events: [{
-        name: "",
-        start: new Date(2021, 5,21),
-        end: new Date(2021, 5,22),
-        uuid: "123",
-      },{
-        name: "",
-        start: new Date(2021, 5,19),
-        end: new Date(2021, 5,22),
-        uuid: "abs",
-      },{
-        name: "",
-        start: new Date(2021, 5,15),
-        end: new Date(2021, 5,18),
-        uuid: "qwerty",
-      }]
+      events: [
+        {
+          name: "",
+          start: new Date(2021, 4, 21),
+          end: new Date(2021, 4, 25),
+          uuid: "123",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 19),
+          end: new Date(2021, 4, 24),
+          uuid: "abs",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 15),
+          end: new Date(2021, 4, 18),
+          uuid: "qwerty",
+        },
+        {
+          name: "",
+          start: new Date(2021, 4, 22),
+          end: new Date(2021, 4, 23),
+          uuid: "qwerty",
+        }
+      ]
     }),
 
     watch: {
@@ -162,6 +172,7 @@
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           // this.buildStoreyMapsMenu()
           this.$store.dispatch('getDevices')
+          this.$store.dispatch('getAlarms')
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -386,24 +397,29 @@
 
 <style scoped>
 .wrapper {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 #myCanvas {
   width: 100%;
-  height: 400px;
+  /* height: 400px; */
+  height: calc(100% - 77px - 162px - 2 * 10px);
+  /* flex: 1 1 auto; */
 }
 .storeys-wrapper {
   overflow: auto;
-  flex: 1 1 auto;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  /* height: 182px; */
 }
 .storeys {
   display: flex;
   justify-content: stretch;
 }
-.timeline {
-  flex: 1 1 auto;
-}
+/* .timeline {
+  height: 77px;
+} */
 .main-plan {
   position: absolute;
   left: 10px;

@@ -37,10 +37,10 @@ export default {
       .datum(this.preparedList)
       .call(timeline({
         widthResizable: true,
-        viewHeight: 150,
+        viewHeight: 70,
         margin: {
-          top: -150,
-          bottom: 30,
+          top: 0,
+          bottom: 25,
           left: 25,
           right: 25
         },
