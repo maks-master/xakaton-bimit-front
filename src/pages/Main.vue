@@ -34,8 +34,8 @@
 
         this.model = this.xktLoader.load({
           id: "myModel",
-          src: "./model/ov.xkt",
-          metaModelSrc: "./model/ov.json",
+          src: "./model/scene.xkt",
+          metaModelSrc: "./model/scene.json",
           edges: true
         });
 
