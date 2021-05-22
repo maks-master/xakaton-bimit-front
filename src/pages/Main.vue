@@ -2,13 +2,16 @@
 
   .wrapper
     canvas#myCanvas
-    storey-view.main-plan( v-if="current" :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
-    .storeys-wrapper( v-else )
+    
+    .storeys-wrapper( v-if="!current" )
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
-      v-btn( @click="onCancelStorey" ) cancel
     
     vue-timeline.timeline( :data="events" )
+
+    .main-plan( v-if="current" )
+      storey-view( :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
+      v-btn( @click="onCancelStorey" ) cancel
 
     .buttons
       v-tooltip( right open-delay=300)
@@ -58,6 +61,7 @@
     },
 
     data: () => ({
+      panel: [],
       storeys: [],
       current: null,
       events: [{

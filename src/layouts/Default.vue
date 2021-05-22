@@ -10,7 +10,7 @@
       DeviceList
 
     v-main(app)
-      v-container
+      v-container(fluid)
         router-view
 
     v-footer.py-5(padless)
