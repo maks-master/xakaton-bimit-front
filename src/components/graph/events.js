@@ -20,7 +20,7 @@ export default config => selection => {
   g.append('rect')
     .attr('width', d => d.end ? timeScale(d.end)-timeScale(d.start) : 10)
     .attr('height', height)
-    .attr('fill', 'rgba(85, 187, 238, 0.2)')
+    .attr('fill', 'rgba(255, 60, 0, 0.2)')
     // .attr('ry', 6)
 
   g.append('text')

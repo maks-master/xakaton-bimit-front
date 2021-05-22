@@ -5,6 +5,13 @@ import { unionBy } from 'lodash'
 
 Vue.use(Vuex)
 
+import { SensorType } from '@/assets/enums'
+
+let lastTime = null
+
+// eslint-disable-next-line
+let host = window.settings.server.url
+
 export default new Vuex.Store({
   state: {
     devices: [],
@@ -19,7 +26,7 @@ export default new Vuex.Store({
     },
 
     alarms: [],
-    lastTime: null
+    sensorType: SensorType.TEMPERATURE
   },
 
   getters: {
@@ -54,9 +61,11 @@ export default new Vuex.Store({
       state.alarms = unionBy(state.alarms, alarms)
     },
 
-    SAVE_LAST_TIME: (state, time) => {
-      state.lastTime = time
-    }
+    SET_SENSOR_TYPE: (state, type) => {
+      state.sensorType = type
+      state.alarms = []
+      lastTime = null
+    },
   },
 
   actions: {
@@ -69,16 +78,18 @@ export default new Vuex.Store({
     },
 
     async getAlarms ({ commit, dispatch, state }) {
-      let url = 'http://192.168.1.25:8080/xakaton/device/0/alarms'
-      if (state.lastTime) {
-        url += `/${state.lastTime}`
+      let url = `http://192.168.1.25:8080/xakaton/device/${state.sensorType}/alarms`
+      if (lastTime) {
+        url += `/${lastTime}`
       }
-      
-      let response = await fetch(url)
-      let json = await response.json()
 
-      commit('ADD_ALARMS', json.alarms)
-      commit('SAVE_LAST_TIME', json.time)
+      let response = await fetch(url)
+      let { time, alarms } = await response.json()
+
+      if (alarms && time) {
+        commit('ADD_ALARMS', alarms)
+        lastTime = time
+      }
 
       setTimeout(() => {
         dispatch('getAlarms')
@@ -94,6 +105,11 @@ export default new Vuex.Store({
       let json = await response.json()
       commit('UPDATE_DEVICE',json)
     },
+
+    
+    switchSensors({ commit }, sensorType) {
+      commit('SET_SENSOR_TYPE', sensorType)
+    }
 
   },
 
