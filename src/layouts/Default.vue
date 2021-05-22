@@ -1,5 +1,5 @@
 <template lang="pug">
-  v-app(v-resize="onResize")
+  v-app
     v-app-bar(app elevation="1" )
 
     v-main.mb-3(app)
