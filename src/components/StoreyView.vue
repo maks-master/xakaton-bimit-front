@@ -98,9 +98,9 @@ export default {
 }
 .teaser {
   position: absolute;
-  top: 25px;
-  left: 0px;
-  width: 100%;
+  top: 28px;
+  left: 5px;
+  width: calc(100% - 10px);
   padding: 5px;
   font-size: 12px;
 }
