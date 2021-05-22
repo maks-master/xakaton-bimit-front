@@ -13,9 +13,21 @@
     .buttons
       v-tooltip( right open-delay=300)
         template( v-slot:activator="{ on, attrs }" )
-          v-btn.mt-4( @click=" showOnlySelectedObjects()" color="#3b93af" v-on="on")
-            v-img( src="/public/icons/light_96px.png" width="40" height="40" )
-        span Показать только выделенные элементы
+          v-btn( width="40" height="50" tile v-on="on" )
+            v-img( src="/icons/light_96px.png" height="48" contain )
+        span Показать только температурные датчики
+
+      v-tooltip( right open-delay=300)
+        template( v-slot:activator="{ on, attrs }" )
+          v-btn.mt-4( width="40" height="50" tile v-on="on" )
+            v-img( src="/icons/light_96px.png" height="48" contain )
+        span Показать только датчики освещения
+
+      v-tooltip( right open-delay=300)
+        template( v-slot:activator="{ on, attrs }" )
+          v-btn.mt-4( width="40" height="50" tile v-on="on" )
+            v-img( src="/icons/lightning_bolt_96px.png" height="48" contain )
+        span Показать только датчики напряжения
 
 </template>
 
@@ -362,6 +374,8 @@
   user-select: none;
 }
 .buttons {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   top: 20px;
   left: 20px;
