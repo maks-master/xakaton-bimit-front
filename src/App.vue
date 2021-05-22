@@ -1,6 +1,7 @@
 <template lang="pug">
   v-app 
-    HelloWorld
+    router-view
+    //- HelloWorld
 </template>
 
 <script>
