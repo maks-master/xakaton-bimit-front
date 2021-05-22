@@ -82,11 +82,12 @@
     watch: {
       devices: 'onDeviceUpdate',
       deviceToEdit: 'bindEditMode',
+      deviceStates: 'onDeviceStatesUpdate'
     },
 
     computed: {
       ...mapState(['devicesEditMode', 'deviceToEdit', 'deviceEditDialog', 'sensorType']),
-      ...mapGetters(['devices']),
+      ...mapGetters(['devices', 'deviceStates']),
 
       sensors () {
         return [
@@ -106,20 +107,40 @@
       ...mapMutations(['SET_DEVICE_TO_SAVE','SET_DEVICE_EDIT_DIALOG']),
 
       onEventClick (event) {
-        console.log(event);
-        console.log(this.viewer.camera);
-
         let { deviceUuid } = event
         let device = this.devices.find(item => item.uuid === deviceUuid)
+
         if (device) {
+          let object = this.deviceMeshes.find(d => d.id == device.uuid)
+          // let node = this.viewer.scene.objects[device.elementId]
+          console.log(device);
+          console.log(object);
+
+          // this.viewer.cameraFlight.flyTo(node)
+
           let { x, y, z } = device.cameraPosition
           this.viewer.camera.eye = [x, y, z]
-          this.viewer.camera.look = [device.position.x, device.position.y, device.position.z] 
+          this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
+          
+          let ids = this.viewer.scene.visibleObjectIds
+          this.viewer.scene.setObjectsHighlighted(ids, false)
+          this.viewer.scene.setObjectsHighlighted([device.uuid], true)
         }
       },
 
       onSwicth (type) {
         this.switchSensors(type)
+      },
+
+      onDeviceStatesUpdate () {
+        this.deviceStates.forEach(item => {
+          let { deviceUuid, color } = item
+          let object = this.deviceMeshes.find(d => d.id == deviceUuid)
+
+          if (object) {
+            object.colorize = color.split(',').map(c => +c / 255)
+          }
+        })
       },
 
       onDeviceUpdate () {
@@ -241,69 +262,6 @@ console.log(device_EDIT)
 
             let metaObject = this.viewer.metaScene.metaObjects[storeyId]
             this.storeys.push({ storeyMap, name: metaObject.name })
-
-            // img.onmouseenter = () => {
-            //     img.style.cursor = "default";
-            // };
-
-            // img.onmousemove = (e) => {
-            //     img.style.cursor = "default";
-            //     const imagePos = [e.offsetX, e.offsetY];
-            //     const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {});
-            //     if (pickResult) {
-            //         const entity = pickResult.entity;
-            //         const metaObject = this.viewer.metaScene.metaObjects[entity.id];
-            //         if (metaObject) {
-            //             if (canStandOnTypes[metaObject.type]) {
-            //                 img.style.cursor = "pointer";
-            //             }
-            //         }
-            //     }
-            // };
-
-            // img.onmouseleave = () => {
-            //     img.style.cursor = "default";
-            // };
-
-            // const worldPos = math.vec3();
-
-            // img.onclick = (e) => {
-
-            //     const imagePos = [e.offsetX, e.offsetY];
-
-            //     const pickResult = this.storeyViewsPlugin.pickStoreyMap(storeyMap, imagePos, {
-            //         pickSurface: true
-            //     });
-
-            //     if (pickResult) {
-
-            //         worldPos.set(pickResult.worldPos);
-
-            //         // Set camera vertical position at the mid point of the storey's vertical
-            //         // extents - note how this is adapts to whichever of the X, Y or Z axis is
-            //         // designated the World's "up" axis
-
-            //         const camera = this.viewer.scene.camera;
-            //         const idx = camera.xUp ? 0 : (camera.yUp ? 1 : 2); // Find the right axis for "up"
-            //         const storey = this.storeyViewsPlugin.storeys[storeyMap.storeyId];
-            //         worldPos[idx] = (storey.aabb[idx] + storey.aabb[3 + idx]) / 2;
-
-            //         this.viewer.cameraFlight.flyTo({
-            //             eye: worldPos,
-            //             up: this.viewer.camera.worldUp,
-            //             look: math.addVec3(worldPos, this.viewer.camera.worldForward, []),
-            //             projection: "perspective",
-            //             duration: 1.5
-            //         }, () => {
-            //             this.viewer.cameraControl.navMode = "firstPerson";
-            //             this.viewer.cameraControl.followPointer = false;
-            //         });
-            //     } else {
-            //         cameraMemento.restoreCamera(this.viewer.scene, () => {
-            //             this.viewer.cameraControl.navMode = "planView";
-            //         });
-            //     }
-            // };
         }
       },
 
@@ -317,22 +275,14 @@ console.log(device_EDIT)
         let { storeyMap } = storey
         console.log(storeyMap.storeyId)
 
-        // this.cameraMemento.saveCamera(this.viewer.scene)
-        // this.objectsMemento.saveObjects(this.viewer.scene)
-
         this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
           hideOthers: true,
           useObjectStates: false
         })
 
         this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
-          // projection: "ortho",
-          projection: "perspective", // Perspective projection
-          duration: 2.0,       // 2.5 second transition
-          // fitFOV: 65,
-          // done: () => {
-          //   this.viewer.cameraControl.planView = true; // Disable rotation
-          // }
+          projection: "perspective",
+          duration: 2.0,
         })
 
         this.current = storey
@@ -368,9 +318,6 @@ console.log(device_EDIT)
             // projection: "ortho",
             projection: "perspective",
             duration: 1.5,
-            // done: () => {
-            //   this.viewer.cameraControl.navMode = "planView"
-            // }
           })
         }
       },
@@ -388,7 +335,7 @@ console.log(device_EDIT)
                 children: [
                     new Mesh(this.model, {
                         geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
-                        material: new PhongMaterial(this.viewer.scene, {emissive: [1, 0, 0], diffuse: [0, 0, 0]}),
+                        material: new PhongMaterial(this.viewer.scene, {emissive: [0, 1, 0], diffuse: [0, 0, 0]}),
                         pickable: false
                     })
                 ]

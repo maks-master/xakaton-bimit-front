@@ -26,7 +26,9 @@ export default new Vuex.Store({
     },
 
     alarms: [],
-    sensorType: SensorType.TEMPERATURE
+    sensorType: SensorType.TEMPERATURE,
+
+    deviceStates: []
   },
 
   getters: {
@@ -66,6 +68,10 @@ export default new Vuex.Store({
       state.alarms = []
       lastTime = null
     },
+
+    UPDATE_DEVICE_STATES: (state, states) => {
+      state.deviceStates = states
+    }
   },
 
   actions: {
@@ -96,13 +102,13 @@ export default new Vuex.Store({
       }, 400)
     },
 
-    async getDeviceStates ({ dispatch }) {
+    async getDeviceStates ({ commit, dispatch }) {
       let url = `http://192.168.1.25:8080/xakaton/model/devices/state`
       let response = await fetch(url)
       let json = await response.json()
 
       if (json) {
-        // commit('ADD_ALARMS', alarms)
+        commit('UPDATE_DEVICE_STATES', json)
       }
 
       setTimeout(() => {
