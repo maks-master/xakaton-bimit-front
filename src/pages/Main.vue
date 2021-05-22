@@ -7,10 +7,8 @@
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
     v-btn( @click="onCancelStorey" ) cancel
-
     
-    
-    
+    vue-timeline( :data="events" )
 
 </template>
 
@@ -29,17 +27,33 @@
 
   import { mapGetters } from 'vuex'
 
+  import VueTimeline from "vue-timeline-component"
+
   const worldPos = math.vec3();
 
   export default {
 
     components: {
-      StoreyView
+      StoreyView, 
+      VueTimeline,
     },
 
     data: () => ({
       storeys: [],
-      current: null
+      current: null,
+      events: [{
+        name: "event 1",
+        start: new Date(2020, 1,1),
+        end: new Date(2020, 1,4),
+      },{
+        name: "event 2",
+        start: new Date(2020, 1,2),
+        end: new Date(2020, 1,5),
+      },{
+        name: "event 3",
+        start: new Date(2020, 1,3),
+        end: new Date(2020, 1,10),
+      }]
     }),
 
     watch: {
@@ -260,6 +274,9 @@
       },
 
       addDevice (device) {
+        // let object = this.viewer.metaScene.metaObjects[device.elementId]
+        // console.log(object);
+
         const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
             xSize: 1,
             ySize: 1,
