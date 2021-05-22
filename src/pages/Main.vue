@@ -14,11 +14,15 @@
   import { Viewer } from '@xeokit/xeokit-sdk/src/viewer/Viewer.js'
   import { XKTLoaderPlugin } from '@xeokit/xeokit-sdk/src/plugins/XKTLoaderPlugin/XKTLoaderPlugin.js'
 
-  import {Mesh, Node, PhongMaterial, buildBoxGeometry, ReadableGeometry} from "@xeokit/xeokit-sdk/src/viewer/scene"
+  // eslint-disable-next-line
+  import { Mesh, Node, PhongMaterial, buildBoxGeometry, ReadableGeometry } from "@xeokit/xeokit-sdk/src/viewer/scene"
+
   // eslint-disable-next-line
   import { StoreyViewsPlugin, math, CameraMemento, ObjectsMemento } from "@xeokit/xeokit-sdk"
 
   import StoreyView from '@/components/StoreyView'
+
+  import { mapGetters } from 'vuex'
 
   const worldPos = math.vec3();
 
@@ -33,12 +37,25 @@
       current: null
     }),
 
+    watch: {
+      devices: 'onDeviceUpdate'
+    },
+
+    computed: {
+      ...mapGetters(['devices']),
+    },
+
     mounted () {
       this.init()
-      this.$store.dispatch('getDevices')
     },
 
     methods: {
+
+      onDeviceUpdate () {
+        this.devices.forEach(device => {
+          this.addDevice(device)
+        })
+      },
 
       init() {
         this.viewer = new Viewer({
@@ -64,6 +81,7 @@
           this.viewer.cameraFlight.flyTo(this.model)
           this.viewer.scene.setObjectsOpacity(this.viewer.metaScene.getObjectIDsByType("IfcDoor"), 0.3)
           this.buildStoreyMapsMenu()
+          this.$store.dispatch('getDevices')
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -237,83 +255,46 @@
         }
       },
 
-      addMesh () {
+      addDevice (device) {
         const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
             xSize: 1,
             ySize: 1,
             zSize: 1
-        }));
+        }))
 
-        new Node(this.viewer.scene, {
-            id: "table",
-            isModel: false,
-            rotation: [0, 50, 0],
-            position: [0, 0, 0],
-            scale: [1, 1, 1],
-
-            children: [
-
-                new Mesh(this.viewer.scene, {
-                    id: "redLeg",
-                    isObject: true,
-                    position: [-4, -6, -4],
-                    scale: [1, 3, 1],
-                    rotation: [0, 0, 0],
-                    material: new PhongMaterial(this.viewer.scene, {
-                        diffuse: [1, 0.3, 0.3]
-                    }),
-                    geometry: boxGeometry
-                }),
-
-                new Mesh(this.viewer.scene, {
-                    id: "greenLeg",
-                    isObject: true,
-                    position: [4, -6, -4],
-                    scale: [1, 3, 1],
-                    rotation: [0, 0, 0],
-                    material: new PhongMaterial(this.viewer.scene, {
-                        diffuse: [0.3, 1.0, 0.3]
-                    }),
-                    geometry: boxGeometry
-                }),
-
-                new Mesh(this.viewer.scene, {
-                    id: "blueLeg",
-                    isObject: true,
-                    position: [4, -6, 4],
-                    scale: [1, 3, 1],
-                    rotation: [0, 0, 0],
-                    material: new PhongMaterial(this.viewer.scene, {
-                        diffuse: [0.3, 0.3, 1.0]
-                    }),
-                    geometry: boxGeometry
-                }),
-
-                new Mesh(this.viewer.scene, {
-                    id: "yellowLeg",
-                    isObject: true,
-                    position: [-4, -6, 4],
-                    scale: [1, 3, 1],
-                    rotation: [0, 0, 0],
-                    material: new PhongMaterial(this.viewer.scene, {
-                          diffuse: [1.0, 1.0, 0.0]
-                    }),
-                    geometry: boxGeometry
-                }),
-
-                new Mesh(this.viewer.scene, {
-                    id: "tableTop",
-                    isObject: true,
-                    position: [0, -3, 0],
-                    scale: [6, 0.5, 6],
-                    rotation: [0, 0, 0],
-                    material: new PhongMaterial(this.viewer.scene, {
-                        diffuse: [1.0, 0.3, 1.0]
-                    }),
-                    geometry: boxGeometry
-                })
-            ]
+        new Mesh(this.viewer.scene, {
+          id: device.uuid,
+          isObject: true,
+          position: [device.position.x, device.position.y, device.position.z],
+          scale: [1, 1, 1],
+          rotation: [0, 0, 0],
+          material: new PhongMaterial(this.viewer.scene, {
+              diffuse: [1.0, 0.3, 1.0]
+          }),
+          geometry: boxGeometry
         })
+
+        // new Node(this.viewer.scene, {
+        //     id: device.uuid,
+        //     isModel: false,
+        //     rotation: [0, 0, 0],
+        //     position: [device.position.x, device.position.y, device.position.z],
+        //     scale: [1, 1, 1],
+
+        //     children: [
+        //       new Mesh(this.viewer.scene, {
+        //         id: "tableTop",
+        //         isObject: true,
+        //         position: [0, 0, 0],
+        //         scale: [1, 1, 1],
+        //         rotation: [0, 0, 0],
+        //         material: new PhongMaterial(this.viewer.scene, {
+        //             diffuse: [1.0, 0.3, 1.0]
+        //         }),
+        //         geometry: boxGeometry
+        //       })
+        //     ]
+        // })
       }
     }
   }
