@@ -316,49 +316,51 @@
       },
 
       addDevice (device) {
-        // let object = this.viewer.metaScene.metaObjects[device.elementId]
-        // console.log(object);
+        if (device.elementId && device.position){
+          // let object = this.viewer.metaScene.metaObjects[device.elementId]
+          // console.log(object);
 
-        const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
-            xSize: 1,
-            ySize: 1,
-            zSize: 1
-        }))
+          const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
+              xSize: 1,
+              ySize: 1,
+              zSize: 1
+          }))
 
-        new Mesh(this.model, {
-          id: device.uuid,
-          // isModel: true,
-          // pickable: true,
-          position: [device.position.x, device.position.y, device.position.z],
-          scale: [1, 1, 1],
-          rotation: [0, 0, 0],
-          material: new PhongMaterial(this.viewer.scene, {
-              diffuse: [1.0, 0.3, 1.0]
-          }),
-          geometry: boxGeometry
-        })
+          new Mesh(this.model, {
+            id: device.uuid,
+            // isModel: true,
+            // pickable: true,
+            position: [device.position.x, device.position.y, device.position.z],
+            scale: [1, 1, 1],
+            rotation: [0, 0, 0],
+            material: new PhongMaterial(this.viewer.scene, {
+                diffuse: [1.0, 0.3, 1.0]
+            }),
+            geometry: boxGeometry
+          })
 
-        // new Node(this.viewer.scene, {
-        //     id: device.uuid,
-        //     isModel: true,
-        //     rotation: [0, 0, 0],
-        //     position: [device.position.x, device.position.y, device.position.z],
-        //     scale: [1, 1, 1],
+          // new Node(this.viewer.scene, {
+          //     id: device.uuid,
+          //     isModel: true,
+          //     rotation: [0, 0, 0],
+          //     position: [device.position.x, device.position.y, device.position.z],
+          //     scale: [1, 1, 1],
 
-        //     children: [
-        //       new Mesh(this.viewer.scene, {
-        //         id: `${device.uuid}_mesh`,
-        //         isObject: true,
-        //         position: [0, 0, 0],
-        //         scale: [1, 1, 1],
-        //         rotation: [0, 0, 0],
-        //         material: new PhongMaterial(this.viewer.scene, {
-        //             diffuse: [1.0, 0.3, 1.0]
-        //         }),
-        //         geometry: boxGeometry
-        //       })
-        //     ]
-        // })
+          //     children: [
+          //       new Mesh(this.viewer.scene, {
+          //         id: `${device.uuid}_mesh`,
+          //         isObject: true,
+          //         position: [0, 0, 0],
+          //         scale: [1, 1, 1],
+          //         rotation: [0, 0, 0],
+          //         material: new PhongMaterial(this.viewer.scene, {
+          //             diffuse: [1.0, 0.3, 1.0]
+          //         }),
+          //         geometry: boxGeometry
+          //       })
+          //     ]
+          // })
+        }
       }
     }
   }
