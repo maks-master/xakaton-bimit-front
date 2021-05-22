@@ -76,7 +76,7 @@
     data: () => ({
       panel: [],
       storeys: [],
-      current: null,
+      current: null
     }),
 
     watch: {
@@ -130,7 +130,7 @@
       },
 
       init() {
-        this.lastEntity = null
+        this.deviceMeshes = []
         this.viewer = new Viewer({
           canvasId: "myCanvas",
           transparent: true,
@@ -188,14 +188,15 @@
           if (this.deviceToEdit && this.hitHelper && this.hitHelper.node.position) {
             console.log('‼️ HELPER:', this.deviceToEdit)
             console.log('‼️ HELPER:', this.hitHelper.node.position)
-
+console.log(this.deviceToEdit)
             let device_EDIT = JSON.parse(JSON.stringify(this.deviceToEdit))
-            if (device_EDIT.position == null) device_EDIT.position = {}
+console.log(device_EDIT)
+            if (!device_EDIT.position || device_EDIT.position == null) device_EDIT.position = {}
             device_EDIT.position.x = this.hitHelper.node.position[0]
             device_EDIT.position.y = this.hitHelper.node.position[1]
             device_EDIT.position.z = this.hitHelper.node.position[2]
 
-            if (device_EDIT.cameraPosition == null) device_EDIT.cameraPosition = {}
+            if (!device_EDIT.cameraPosition || device_EDIT.cameraPosition == null) device_EDIT.cameraPosition = {}
             device_EDIT.cameraPosition.x = this.viewer.camera.eye[0]
             device_EDIT.cameraPosition.y = this.viewer.camera.eye[1]
             device_EDIT.cameraPosition.z = this.viewer.camera.eye[2]
@@ -375,76 +376,25 @@
       },
 
       addDevice (device) {
-        let object = this.viewer.scene.objects[device.elementId]
-        console.log(object);
-        //if (object)  this.viewer.scene.objects.removeChild(object)
 
         if (device.elementId && device.position){
 
-          // new Node(this.viewer.scene, {
-          //       id: device.uuid,
-          //       pickable: false,
-          //       visible: true,
-          //       position: [device.position.x, device.position.y, device.position.z],
+          let n = new Node(this.model, {
+                id: device.uuid,
+                pickable: false,
+                visible: true,
+                position: [device.position.x, device.position.y, device.position.z],
 
-          //       children: [
-          //           new Mesh(this.viewer.scene, {
-          //               geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
-          //               material: new PhongMaterial(this.viewer.scene, {emissive: [1, 0, 0], diffuse: [0, 0, 0]}),
-          //               pickable: false
-          //           }),
-          //           new Mesh(this.viewer.scene, {
-          //               geometry: new VBOGeometry(this.viewer.scene, {
-          //                   primitive: "lines",
-          //                   positions: [
-          //                       0.0, 0.0, 0.0, 0.0, 0.0, -2.0
-          //                   ],
-          //                   indices: [0, 1]
-          //               }),
-          //               material: new PhongMaterial(this.viewer.scene, {emissive: [1, 1, 0], diffuse: [0, 0, 0], lineWidth: 4}),
-          //               pickable: false
-          //           })
-          //       ]
-          //   });
+                children: [
+                    new Mesh(this.model, {
+                        geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
+                        material: new PhongMaterial(this.viewer.scene, {emissive: [1, 0, 0], diffuse: [0, 0, 0]}),
+                        pickable: false
+                    })
+                ]
+            });
 
-          const boxGeometry = new ReadableGeometry(this.viewer.scene, buildBoxGeometry({
-              xSize: .5,
-              ySize: .5,
-              zSize: .5
-          }))
-
-          new Mesh(this.model, {
-            id: device.uuid,
-            position: [device.position.x, device.position.y, device.position.z],
-            scale: [1, 1, 1],
-            rotation: [0, 0, 0],
-            material: new PhongMaterial(this.viewer.scene, {
-                diffuse: [1.0, 0.3, 1.0]
-            }),
-            geometry: boxGeometry
-          })
-
-          // new Node(this.viewer.scene, {
-          //     id: device.uuid,
-          //     isModel: true,
-          //     rotation: [0, 0, 0],
-          //     position: [device.position.x, device.position.y, device.position.z],
-          //     scale: [1, 1, 1],
-
-          //     children: [
-          //       new Mesh(this.viewer.scene, {
-          //         id: `${device.uuid}_mesh`,
-          //         isObject: true,
-          //         position: [0, 0, 0],
-          //         scale: [1, 1, 1],
-          //         rotation: [0, 0, 0],
-          //         material: new PhongMaterial(this.viewer.scene, {
-          //             diffuse: [1.0, 0.3, 1.0]
-          //         }),
-          //         geometry: boxGeometry
-          //       })
-          //     ]
-          // })
+            this.deviceMeshes.push(n);
         }
       },
 
@@ -537,10 +487,27 @@
       },
 
       saveEditSensor(){
+        let pos = [this.deviceEditDialog.device.position.x,this.deviceEditDialog.device.position.y,this.deviceEditDialog.device.position.z]
+
+        this.findStoreyFromElement(this.deviceEditDialog.device.elementId)
+
         this.saveDevice(this.deviceEditDialog.device)
-        this.cancelEditSensor()
         this.hitHelper.hide();
+        let uuid = this.deviceEditDialog.device.uuid
+        let object = this.deviceMeshes.find(d => d.id == uuid)
+        object.position = pos
+
+        this.cancelEditSensor()
+      },
+
+      findStoreyFromElement(elementId){
+        let element = this.viewer.metaScene.metaObjects[elementId]
+        if (element.type == 'IfcBuildingStorey') return element
+        let parent = element.parent
+        if (parent != null) this.findStoreyFromElement(parent.id)
+        return null
       }
+
 
     }
   }
