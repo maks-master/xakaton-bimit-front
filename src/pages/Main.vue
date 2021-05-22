@@ -1,14 +1,14 @@
 <template lang="pug">
 
-  div
+  .wrapper
     canvas#myCanvas
     storey-view.main-plan( v-if="current" :storeyMap="current.storeyMap" :name="current.name" @click.native="onPlanClick" )
-    .wrapper( v-else )
+    .storeys-wrapper( v-else )
       .storeys
         storey-view( v-for="s in storeys" :key="s.storeyMap.storeyId" :storeyMap="s.storeyMap" :name="s.name" @click.native="onStoreyClick(s)" )
-    v-btn( @click="onCancelStorey" ) cancel
+      v-btn( @click="onCancelStorey" ) cancel
     
-    vue-timeline( :data="events" )
+    vue-timeline.timeline( :data="events" )
 
     .buttons
       v-tooltip( right open-delay=300)
@@ -355,16 +355,24 @@
 </script>
 
 <style scoped>
+.wrapper {
+  display: flex;
+  flex-direction: column;
+}
 #myCanvas {
   width: 100%;
   height: 400px;
 }
-.wrapper {
+.storeys-wrapper {
   overflow: auto;
+  flex: 1 1 auto;
 }
 .storeys {
   display: flex;
   justify-content: stretch;
+}
+.timeline {
+  flex: 1 1 auto;
 }
 .main-plan {
   position: absolute;
