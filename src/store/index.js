@@ -47,6 +47,9 @@ export default new Vuex.Store({
   state: {
     devices: [],
 
+    deviceTypes:[],
+    deviceEnumStates:[],
+
     devicesEditMode:false,
     deviceToEdit:null,
 
@@ -72,6 +75,14 @@ export default new Vuex.Store({
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
       state.devices = devices
+    },
+
+    REPLACE_DEVICETYPES: (state, deviceTypes) => {
+      state.deviceTypes = deviceTypes
+    },
+
+    REPLACE_DEVICESTATES: (state, deviceEnumStates) => {
+      state.deviceEnumStates = deviceEnumStates
     },
 
     UPDATE_DEVICE:(state, device) => {
@@ -113,10 +124,28 @@ export default new Vuex.Store({
   },
 
   actions: {
-    async getDevices ({ commit }) {
+    async getDeviceTypes ({ commit }) {
+      let url = host+'/devices/types'
+      let response = await fetch(url)
+      let json = await response.json()
+      commit('REPLACE_DEVICETYPES', json)
+    },
+
+    async getDeviceEnumStates ({ commit }) {
+      let url = host+'/devices/states'
+      let response = await fetch(url)
+      let json = await response.json()
+
+      commit('REPLACE_DEVICESTATES', json)
+    },
+
+    async getDevices ({ commit, dispatch }) {
       let url = host+'/devices'
       let response = await fetch(url)
       let json = await response.json()
+
+      dispatch('getDeviceTypes')
+      dispatch('getDeviceEnumStates')
 
       commit('REPLACE_DEVICES', json)
     },

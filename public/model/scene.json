@@ -26,7 +26,7 @@
     },
     {
       "id": "3krrpJBfL2SBWSONoQ68Xx",
-      "name": "Keller",
+      "name": "Подвал",
       "type": "IfcBuildingStorey",
       "parent": "2yeSWdixz5hBpMywNJnu8J"
     },
@@ -1256,7 +1256,7 @@
     },
     {
       "id": "0jrZ4kmNLEyeIrSAFW8xw8",
-      "name": "Erdgeschoss",
+      "name": "Этаж 1",
       "type": "IfcBuildingStorey",
       "parent": "2yeSWdixz5hBpMywNJnu8J"
     },
@@ -2600,7 +2600,7 @@
     },
     {
       "id": "3wES2XYi17$hrBr7mbDuyg",
-      "name": "1. Obergeschoss",
+      "name": "Этаж 2",
       "type": "IfcBuildingStorey",
       "parent": "2yeSWdixz5hBpMywNJnu8J"
     },
@@ -3824,7 +3824,7 @@
     },
     {
       "id": "2SZ5lnBQD2u9lFVZFen_5J",
-      "name": "2. Obergeschoss",
+      "name": "Этаж 3",
       "type": "IfcBuildingStorey",
       "parent": "2yeSWdixz5hBpMywNJnu8J"
     },
@@ -5048,7 +5048,7 @@
     },
     {
       "id": "3P_7taSfTB1uu5RSuYEGO1",
-      "name": "Dachgeschoss",
+      "name": "Чердак",
       "type": "IfcBuildingStorey",
       "parent": "2yeSWdixz5hBpMywNJnu8J"
     },
