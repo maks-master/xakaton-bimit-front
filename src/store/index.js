@@ -34,10 +34,12 @@ async function getDeviceStates () {
   let response = await fetch(url)
   let json = await response.json()
 
-  return json || []
+  return json
 }
 
+// eslint-disable-next-line
 const debounced_getAlarms = debounce(getAlarms, 500)
+// eslint-disable-next-line
 const debounced_getDeviceStates = debounce(getDeviceStates, 500)
 
 
@@ -149,15 +151,14 @@ export default new Vuex.Store({
 
     async getDeviceStates ({ commit, dispatch }) {
       let json = await debounced_getDeviceStates()
-      commit('UPDATE_DEVICE_STATES', json)
 
       // let url = `${host}/model/devices/state`
       // let response = await fetch(url)
       // let json = await response.json()
 
-      // if (json) {
-      //   commit('UPDATE_DEVICE_STATES', json)
-      // }
+      if (json) {
+        commit('UPDATE_DEVICE_STATES', json)
+      }
 
       setTimeout(() => {
         dispatch('getDeviceStates')
