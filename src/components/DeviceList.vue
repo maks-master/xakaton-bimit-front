@@ -122,12 +122,12 @@ export default {
       this.SET_DEVICE_EDIT_DIALOG(deviceEditDialog)
     },
 
-    // dataBySensor(d){
-    //   let out = ''
-    //   let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
-    //   if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
-    //   return out
-    // },
+    dataBySensor(d){
+      let out = ''
+      let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
+      if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
+      return out
+    },
 
     generate(){
       let url = `http://hakaton.bimit.ru/world/alarm/create`
