@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import { unionBy } from 'lodash'
+import debounce from 'lodash/debounce'
 
 Vue.use(Vuex)
 
@@ -11,6 +12,36 @@ let lastTime = null
 
 // eslint-disable-next-line
 let host = window.settings.server.url
+
+async function getAlarms (sensorType) {
+  let url = `${host}/device/${sensorType}/alarms`
+  if (lastTime) {
+    url += `/${lastTime}`
+  }
+  
+  let response = await fetch(url)
+  let { time, alarms } = await response.json()
+  
+  if (alarms && time) {
+    lastTime = time
+    return alarms
+  }
+  return []
+}
+
+async function getDeviceStates () {
+  let url = `${host}/model/devices/state`
+  let response = await fetch(url)
+  let json = await response.json()
+
+  return json
+}
+
+// eslint-disable-next-line
+const debounced_getAlarms = debounce(getAlarms, 500)
+// eslint-disable-next-line
+const debounced_getDeviceStates = debounce(getDeviceStates, 500)
+
 
 export default new Vuex.Store({
   state: {
@@ -125,18 +156,21 @@ export default new Vuex.Store({
 
     async getAlarms ({ commit, dispatch, state }) {
       if (state.isActive) {
-        let url = `${host}/device/${state.sensorType}/alarms`
-        if (lastTime) {
-          url += `/${lastTime}`
-        }
+        let alarms = await debounced_getAlarms(state.sensorType)
+        commit('ADD_ALARMS', alarms)
+
+        // let url = `${host}/device/${state.sensorType}/alarms`
+        // if (lastTime) {
+        //   url += `/${lastTime}`
+        // }
   
-        let response = await fetch(url)
-        let { time, alarms } = await response.json()
+        // let response = await fetch(url)
+        // let { time, alarms } = await response.json()
   
-        if (alarms && time) {
-          commit('ADD_ALARMS', alarms)
-          lastTime = time
-        }
+        // if (alarms && time) {
+        //   commit('ADD_ALARMS', alarms)
+        //   lastTime = time
+        // }
       }
 
       setTimeout(() => {
@@ -145,9 +179,11 @@ export default new Vuex.Store({
     },
 
     async getDeviceStates ({ commit, dispatch }) {
-      let url = `${host}/model/devices/state`
-      let response = await fetch(url)
-      let json = await response.json()
+      let json = await debounced_getDeviceStates()
+
+      // let url = `${host}/model/devices/state`
+      // let response = await fetch(url)
+      // let json = await response.json()
 
       if (json) {
         commit('UPDATE_DEVICE_STATES', json)
@@ -155,7 +191,7 @@ export default new Vuex.Store({
 
       setTimeout(() => {
         dispatch('getDeviceStates')
-      }, 400)
+      }, 500)
     },
 
     async saveDevice ({ commit }, device) {
