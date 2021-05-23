@@ -4,7 +4,7 @@
     .wrapper( :style="wrapperStyle" )
       img.storey( :src="storeyMap.imageData" :style="imgStyle" @click="onImageClick" )
 
-    .teaser( v-if="hasTeasers" :style="teaserStyle" ) {{ lastTeaser.time }}
+    .teaser( v-if="hasAlert" :style="teaserStyle" ) {{ lastTeaser.time }}
 </template>
 
 <script>
@@ -50,7 +50,7 @@ export default {
       return `background-color: ${color};`
     },
 
-    hasTeasers () {
+    hasAlert () {
       return this.teasers.length > 0
     },
 
