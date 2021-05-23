@@ -289,15 +289,8 @@
             device_EDIT.cameraPosition.z = this.viewer.camera.eye[2]
             device_EDIT.elementId = pickResult.entity.id
 
-            if (!device_EDIT.deviceType || device_EDIT.deviceType == null) device_EDIT.deviceType = {}
-            device_EDIT.deviceType.title = 'Температура'
-            device_EDIT.deviceType.name = 'TEMPERATURE'
-            device_EDIT.deviceType.value = 0
-
-            if (!device_EDIT.deviceState || device_EDIT.deviceState == null) device_EDIT.deviceState = {}
-            device_EDIT.deviceType.title = 'В сети'
-            device_EDIT.deviceType.name = 'ONLINE'
-            device_EDIT.deviceType.value = 0
+            if (!device_EDIT.deviceType || device_EDIT.deviceType == null) device_EDIT.deviceType = {title:'Температура',name:'TEMPERATURE',value:0}
+            if (!device_EDIT.deviceState || device_EDIT.deviceState == null) device_EDIT.deviceState = {title:'В сети',name:'ONLINE',value:0}
 
             let d = {
               show:true,

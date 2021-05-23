@@ -116,16 +116,8 @@ export default {
         device:JSON.parse(JSON.stringify(d))
       }
 
-      if (!deviceEditDialog.device.deviceType || deviceEditDialog.device.deviceType == null) deviceEditDialog.device.deviceType = {}
-      deviceEditDialog.device.deviceType.title = 'Температура'
-      deviceEditDialog.device.deviceType.name = 'TEMPERATURE'
-      deviceEditDialog.device.deviceType.value = 0
-
-      if (!deviceEditDialog.device.deviceState || deviceEditDialog.device.deviceState == null) deviceEditDialog.device.deviceState = {}
-      deviceEditDialog.device.deviceType.title = 'В сети'
-      deviceEditDialog.device.deviceType.name = 'ONLINE'
-      deviceEditDialog.device.deviceType.value = 0
-
+      if (!deviceEditDialog.device.deviceType || deviceEditDialog.device.deviceType == null) deviceEditDialog.device.deviceType = {title:'Температура',name:'TEMPERATURE',value:0}
+      if (!deviceEditDialog.device.deviceState || deviceEditDialog.device.deviceState == null) deviceEditDialog.device.deviceState = {title:'В сети',name:'ONLINE',value:0}
       this.SET_DEVICE_EDIT_DIALOG(deviceEditDialog)
     },
 
