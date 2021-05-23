@@ -118,7 +118,8 @@ export default new Vuex.Store({
       state.deviceStates = states
 
       states.forEach(st => {
-        state.devices.map(d => d.data = `avg:${st.average}, max:${st.max}, min:${st.min}`)
+        let sensor = state.devices.find(d => d.uuid == st.deviceUuid)
+        sensor.data = `avg:${st.average}, max:${st.max}, min:${st.min}`
       })
     },
 
