@@ -130,10 +130,10 @@
           this.viewer.cameraFlight.flyTo(object)
 
           //this.onCancelStorey()
-          
+
           // let node = this.viewer.scene.objects[device.elementId]
-          console.log(device);
-          console.log(object);
+          // console.log(device);
+          // console.log(object);
 
           // this.viewer.cameraFlight.flyTo({ component: object, fitFOV: 75 })
 
