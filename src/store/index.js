@@ -86,9 +86,8 @@ export default new Vuex.Store({
     },
 
     UPDATE_DEVICE:(state, device) => {
-      state.devices.forEach(d => {
-        if (d.uuid == device.uuid) d = device
-      })
+      let curr = state.devices.find(item => item.uuid == device.uuid)
+      if (curr !== undefined) Object.assign(curr, device)
     },
 
     SET_SENSORS_EDIT_MODE: (state, isEditMode) => {
@@ -207,11 +206,6 @@ export default new Vuex.Store({
 
     switchSensors({ commit }, sensorType) {
       commit('SET_SENSOR_TYPE', sensorType)
-    },
-
-    resetAlarm (ctx, deviceUuid) {
-      let url = host + `/model/device/${deviceUuid}/read`
-      fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json;charset=utf-8' }})
     }
 
   },
