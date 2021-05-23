@@ -151,11 +151,23 @@
 
       onDeviceStatesUpdate () {
         this.deviceStates.forEach(item => {
-          let { deviceUuid, color } = item
+          let { deviceUuid, color, alarm } = item
           let object = this.deviceMeshes.find(d => d.id == deviceUuid)
 
+          let colors = [
+            [255, 255, 0],
+            [255, 111, 0],
+            [211, 47, 47],
+            [125, 87, 194],
+          ]
+
           if (object) {
-            object.colorize = color.split(',').map(c => +c / 255)
+            if (alarm) {
+              object.colorize = colors[alarm.alarmLevel.value].map(c => +c / 255)
+            } 
+            else {
+              object.colorize = color.split(',').map(c => +c / 255)
+            }
           }
         })
       },
@@ -364,7 +376,8 @@
             children: [
               new Mesh(this.model, {
                 geometry: new VBOGeometry(this.viewer.scene, buildSphereGeometry({radius: .2})),
-                material: new PhongMaterial(this.viewer.scene, {emissive: [0, 1, 0], diffuse: [0, 0, 0]}),
+                // material: new PhongMaterial(this.viewer.scene, {emissive: [0, 0, 0], diffuse: [0, 0, 0]}),
+                material: new PhongMaterial(this.viewer.scene),
                 pickable: false
               })
             ]
