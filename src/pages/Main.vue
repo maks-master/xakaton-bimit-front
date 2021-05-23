@@ -507,6 +507,7 @@
         if (!object) {
           this.addDevice(this.deviceEditDialog.device)
         }
+        object = this.deviceMeshes.find(d => d.id == uuid)
         object.position = pos
 
         this.cancelEditSensor()
