@@ -126,18 +126,29 @@
 
         if (device) {
           let object = this.deviceMeshes.find(d => d.id == device.uuid)
+
+          this.viewer.cameraFlight.flyTo(object)
+
+          //this.onCancelStorey()
+          
           // let node = this.viewer.scene.objects[device.elementId]
           console.log(device);
           console.log(object);
 
           // this.viewer.cameraFlight.flyTo({ component: object, fitFOV: 75 })
 
-          let { x, y, z } = device.cameraPosition
+          // this.viewer.cameraFlight.flyTo({
+          //   eye: device.cameraPosition,
+          //   up: this.viewer.camera.worldUp,
+          //   look: [device.position.x, device.position.y, device.position.z],
+          //   projection: "perspective",
+          //   duration: 1.5
+          // })
 
-console.log(device.cameraPosition)
+          // let { x, y, z } = device.cameraPosition
 
-          this.viewer.camera.eye = [x, y, z]
-          this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
+          // this.viewer.camera.eye = [x, y, z]
+          // this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
           
           object.selected = true
         }
