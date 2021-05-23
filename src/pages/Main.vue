@@ -38,6 +38,8 @@
           v-text-field(v-model="deviceEditDialog.device.frequency" label="Частота")
           v-text-field(v-model="deviceEditDialog.device.minValue" label="Минимум")
           v-text-field(v-model="deviceEditDialog.device.maxValue" label="Максимум")
+          v-select(v-model="deviceEditDialog.device.deviceType" :items="deviceTypes" item-text="title" item-value="value" label="Тип датчика" return-object)
+          v-select(v-model="deviceEditDialog.device.deviceState" :items="deviceEnumStates" item-text="title" item-value="value" label="Состояние датчика" return-object)
 
           div позиция {{ deviceEditDialog.device.position }}
           div камера {{ deviceEditDialog.device.cameraPosition }}
@@ -88,7 +90,7 @@
     },
 
     computed: {
-      ...mapState(['devicesEditMode', 'deviceToEdit', 'deviceEditDialog', 'sensorType', 'deviceStates']),
+      ...mapState(['devicesEditMode', 'deviceToEdit', 'deviceEditDialog', 'sensorType', 'deviceStates','deviceTypes','deviceEnumStates']),
       ...mapGetters(['devices']),
 
       sensors () {
@@ -250,6 +252,16 @@
             device_EDIT.cameraPosition.y = this.viewer.camera.eye[1]
             device_EDIT.cameraPosition.z = this.viewer.camera.eye[2]
             device_EDIT.elementId = pickResult.entity.id
+
+            if (!device_EDIT.deviceType || device_EDIT.deviceType == null) device_EDIT.deviceType = {}
+            device_EDIT.deviceType.title = 'Температура'
+            device_EDIT.deviceType.name = 'TEMPERATURE'
+            device_EDIT.deviceType.value = 0
+
+            if (!device_EDIT.deviceState || device_EDIT.deviceState == null) device_EDIT.deviceState = {}
+            device_EDIT.deviceType.title = 'В сети'
+            device_EDIT.deviceType.name = 'ONLINE'
+            device_EDIT.deviceType.value = 0
 
             let d = {
               show:true,
