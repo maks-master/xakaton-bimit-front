@@ -501,7 +501,7 @@
         this.findStoreyFromElement(this.deviceEditDialog.device.elementId)
 
         this.saveDevice(this.deviceEditDialog.device)
-        this.hitHelper.hide();
+        if (this.hitHelper) this.hitHelper.hide();
         let uuid = this.deviceEditDialog.device.uuid
         let object = this.deviceMeshes.find(d => d.id == uuid)
         if (!object) {
