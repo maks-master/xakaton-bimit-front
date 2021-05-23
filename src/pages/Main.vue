@@ -30,7 +30,7 @@
         span {{ s.tip }}
 
     .opacityslider
-      v-slider(v-model="modelOacity" max="1" min="0.3" step="0.05" vertical)
+      v-slider(v-model="modelOacity" max="1" min="0.3" step="0.05")
 
     v-dialog(v-model="deviceEditDialog.show" v-if="deviceEditDialog.device" max-width="500")
       v-card
@@ -587,7 +587,8 @@
 }
 .opacityslider {
   position: absolute;
-  top: 20px;
+  //top: 20px;
   right: 20px;
+  width: 100px
 }
 </style>
