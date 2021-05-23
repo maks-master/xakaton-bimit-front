@@ -95,11 +95,12 @@ export default {
   },
 
   computed: {
-    ...mapState(['deviceToEdit','deviceDataToSave','deviceStates']),
+    ...mapState(['deviceToEdit','deviceDataToSave','deviceStates','sensorType']),
     ...mapGetters(['devices']),
 
     assignedDevices(){
-      return this.devices.filter(d => d.elementId && d.position)
+      let st = this.sensorType
+      return this.devices.filter(d => d.elementId && d.position && d.deviceType.value == st)
     },
     notAssignedDevices(){
       return this.devices.filter(d => !d.elementId || !d.position)

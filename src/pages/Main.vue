@@ -130,12 +130,21 @@
 
       onSwicth (type) {
         this.switchSensors(type)
+        this.showSwitchedSensors()
+      },
+
+      showSwitchedSensors(){
 
         this.devices.forEach(device => {
           let object = this.deviceMeshes.find(d => d.id == device.uuid)
           if (object) {
             let { deviceType } = device
-            object.visible = deviceType && deviceType.value == this.sensorType
+            let visible = deviceType && deviceType.value == this.sensorType
+            if (visible && this.current) {
+              let store = this.findStoreyFromElement(device.elementId)
+              visible = store && store.id == this.current.storeyMap.storeyId
+            } 
+            object.visible = visible
           }
         })
       },
@@ -213,7 +222,7 @@
           this.$store.dispatch('getAlarms')
           this.$store.dispatch('getDeviceStates')
 
-          
+          this.model.opacity = 0.6
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -291,21 +300,6 @@
       onStoreyClick (storey) {
         let { storeyMap } = storey
 
-        let metaObject = this.viewer.metaScene.metaObjects[storeyMap.storeyId]
-
-        let devs = this.devices
-        let sensorMeshes = this.deviceMeshes
-
-        sensorMeshes.map(m => m.visible = false)
-
-        metaObject.children.forEach(c => {
-          let ss = devs.find(me => me.elementId == c.id)
-          if (ss) {
-            let ssmesh = sensorMeshes.find(sm => sm.id == ss.uuid)
-            if (ssmesh) ssmesh.visible = true
-          }
-        })
-
         this.storeyViewsPlugin.showStoreyObjects(storeyMap.storeyId, {
           hideOthers: true,
           useObjectStates: false
@@ -318,6 +312,8 @@
         })
 
         this.current = storey
+
+        this.showSwitchedSensors()
       },
 
       onPlanClick (imagePos) {
@@ -483,9 +479,11 @@
 
       findStoreyFromElement(elementId){
         let element = this.viewer.metaScene.metaObjects[elementId]
-        if (element.type == 'IfcBuildingStorey') return element
-        let parent = element.parent
-        if (parent != null) return this.findStoreyFromElement(parent.id)
+        if (element) {
+          if (element.type == 'IfcBuildingStorey') return element
+          let parent = element.parent
+          if (parent != null) return this.findStoreyFromElement(parent.id)
+        }
         return null
       }
 
