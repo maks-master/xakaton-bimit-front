@@ -485,6 +485,9 @@
         this.hitHelper.hide();
         let uuid = this.deviceEditDialog.device.uuid
         let object = this.deviceMeshes.find(d => d.id == uuid)
+        if (!object) {
+          this.addDevice(this.deviceEditDialog.device)
+        }
         object.position = pos
 
         this.cancelEditSensor()
