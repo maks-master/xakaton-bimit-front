@@ -8,6 +8,8 @@ Vue.use(Vuex)
 
 import { SensorType } from '@/assets/enums'
 
+let sensors = {}
+
 let lastTime = null
 
 // eslint-disable-next-line
@@ -74,7 +76,10 @@ export default new Vuex.Store({
 
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
-      devices.forEach(d => d.data = '')
+      devices.forEach(d => {
+        d.data = ''
+        sensors[d.uuid] = d
+      })
       state.devices = devices
     },
 
@@ -116,11 +121,7 @@ export default new Vuex.Store({
 
     UPDATE_DEVICE_STATES: (state, states) => {
       state.deviceStates = states
-
-      states.forEach(st => {
-        let sensor = state.devices.find(d => d.uuid == st.deviceUuid)
-        sensor.data = `avg:${st.average}, max:${st.max}, min:${st.min}`
-      })
+      states.forEach(st => sensors[st.deviceUuid].data = `avg:${st.average}, max:${st.max}, min:${st.min}`)
     },
 
     SET_ACTIVITY: (state, active) => {
