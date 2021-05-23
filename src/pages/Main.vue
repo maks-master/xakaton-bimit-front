@@ -30,6 +30,9 @@
             v-img( :src="`/icons/${s.icon}.png`" height="48" aspect-ratio="1" contain )
         span {{ s.tip }}
 
+    .opacityslider
+      v-slider(v-model="modelOacity" max="1" min="0.3" step="0.05" vertical)
+
     v-dialog(v-model="deviceEditDialog.show" v-if="deviceEditDialog.device" max-width="500")
       v-card
         v-card-title {{ deviceEditDialog.title }}
@@ -83,13 +86,17 @@
     data: () => ({
       panel: [],
       storeys: [],
-      current: null
+      current: null,
+      modelOacity:0.6
     }),
 
     watch: {
       devices: 'onDeviceUpdate',
       deviceToEdit: 'bindEditMode',
-      deviceStates: 'onDeviceStatesUpdate'
+      deviceStates: 'onDeviceStatesUpdate',
+      modelOacity(val){
+        this.model.opacity = val
+      }
     },
 
     computed: {
@@ -251,7 +258,7 @@
           this.$store.dispatch('getAlarms')
           this.$store.dispatch('getDeviceStates')
 
-          this.model.opacity = 0.6
+          this.model.opacity = this.modelOacity
         })
 
         this.viewer.cameraControl.on("picked", (pickResult) => {
@@ -508,12 +515,13 @@
         this.findStoreyFromElement(this.deviceEditDialog.device.elementId)
 
         this.saveDevice(this.deviceEditDialog.device)
-        this.hitHelper.hide();
+        if (this.hitHelper) this.hitHelper.hide();
         let uuid = this.deviceEditDialog.device.uuid
         let object = this.deviceMeshes.find(d => d.id == uuid)
         if (!object) {
           this.addDevice(this.deviceEditDialog.device)
         }
+        object = this.deviceMeshes.find(d => d.id == uuid)
         object.position = pos
 
         this.cancelEditSensor()
@@ -583,5 +591,10 @@
   position: absolute;
   top: 20px;
   left: 20px;
+}
+.opacityslider {
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 </style>
