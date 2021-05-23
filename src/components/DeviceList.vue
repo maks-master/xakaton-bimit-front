@@ -21,8 +21,8 @@
             v-list-item(v-for="d in assignedDevices" :key="d.uuid")
               v-list-item-content
                 v-list-item-title {{ d.name }}
-                v-list-item-subtitle {{ d.data }}
-                //v-list-item-subtitle {{ dataBySensor(d) }}
+                //v-list-item-subtitle {{ d.data }}
+                v-list-item-subtitle {{ dataBySensor(d) }}
 
           v-divider.mb-2
           v-list-item
