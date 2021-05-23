@@ -207,6 +207,11 @@ export default new Vuex.Store({
 
     switchSensors({ commit }, sensorType) {
       commit('SET_SENSOR_TYPE', sensorType)
+    },
+
+    resetAlarm (ctx, deviceUuid) {
+      let url = host + `/model/device/${deviceUuid}/read`
+      fetch(url, { method: 'PATCH', headers: { 'Content-Type': 'application/json;charset=utf-8' }})
     }
 
   },

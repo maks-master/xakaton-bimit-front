@@ -20,6 +20,7 @@
 
     v-card.main-plan( v-if="current" )
       storey-view( :storeyMap="current.storeyMap" :name="current.name" max-size="300" @imageclick="onPlanClick" )
+      alert-list( :storeyMap="current.storeyMap" :device-ids="current.devices" @select="onEventClick" )
       v-btn.main-plan__close( fab small @click="onCancelStorey" ) X
 
     .buttons
@@ -63,6 +64,7 @@
 
   import StoreyView from '@/components/StoreyView'
   import Timeline from "@/components/Timeline"  
+  import AlertList from "@/components/AlertList"  
 
   import { mapState, mapGetters, mapMutations, mapActions } from 'vuex'
 
@@ -75,6 +77,7 @@
     components: {
       StoreyView,
       Timeline,
+      AlertList,
     },
 
     data: () => ({
@@ -129,6 +132,10 @@
           object.selected = true
         }
       },
+
+      // onAlertClick (event) {
+
+      // },
 
       onSwicth (type) {
         this.switchSensors(type)
