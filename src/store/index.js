@@ -86,7 +86,7 @@ export default new Vuex.Store({
     },
 
     UPDATE_DEVICE:(state, device) => {
-      state.devices.map(d => {
+      state.devices.forEach(d => {
         if (d.uuid == device.uuid) d = device
       })
     },
