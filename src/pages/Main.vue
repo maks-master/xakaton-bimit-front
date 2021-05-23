@@ -130,6 +130,9 @@
           // this.viewer.cameraFlight.flyTo({ component: object, fitFOV: 75 })
 
           let { x, y, z } = device.cameraPosition
+
+console.log(device.cameraPosition)
+
           this.viewer.camera.eye = [x, y, z]
           this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
           
@@ -587,8 +590,7 @@
 }
 .opacityslider {
   position: absolute;
-  //top: 20px;
   right: 20px;
-  width: 100px
+  width: 200px
 }
 </style>
