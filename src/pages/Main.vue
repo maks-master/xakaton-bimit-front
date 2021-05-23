@@ -163,12 +163,20 @@
             [125, 87, 194],
           ]
 
+          let scales = [2, 4, 6, 8]
+
           if (object) {
             if (alarm) {
-              object.colorize = colors[alarm.alarmLevel.value].map(c => +c / 255)
+              let { value } = alarm.alarmLevel
+              object.colorize = colors[value].map(c => +c / 255)
+
+              let scale = scales[value]
+              object.scale = [scale, scale, scale]
+              // object.scale = [value + 2, value + 2, value + 2]
             } 
             else {
               object.colorize = color.split(',').map(c => +c / 255)
+              object.scale = [1, 1, 1]
             }
           }
         })
@@ -332,7 +340,6 @@
         this.storeyViewsPlugin.gotoStoreyCamera(storeyMap.storeyId, {
           projection: "perspective",
           duration: 2.0,
-          fitFOV: 50,
         })
 
         this.current = storey
