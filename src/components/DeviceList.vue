@@ -100,7 +100,7 @@ export default {
 
     assignedDevices(){
       let st = this.sensorType
-      return this.devices.filter(d => d.elementId && d.position && d.deviceType.value == st)
+      return this.devices.filter(d => d.elementId && d.position && d.deviceType && d.deviceType.value == st)
     },
     notAssignedDevices(){
       return this.devices.filter(d => !d.elementId || !d.position)
