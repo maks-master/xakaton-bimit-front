@@ -48,7 +48,7 @@ proxy_read_timeout         6000000;
 ```
 var settings = {
   server: {
-    url: 'http://IP_ADRES/xakaton/'
+    url: 'http://IP_ADRESS/xakaton/'
   }
 }
 
