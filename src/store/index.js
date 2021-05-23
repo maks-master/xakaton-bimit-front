@@ -74,6 +74,7 @@ export default new Vuex.Store({
 
   mutations: {
     REPLACE_DEVICES: (state, devices) => {
+      devices.forEach(d => d.data = '')
       state.devices = devices
     },
 
@@ -115,6 +116,10 @@ export default new Vuex.Store({
 
     UPDATE_DEVICE_STATES: (state, states) => {
       state.deviceStates = states
+
+      states.forEach(st => {
+        state.devices.map(d => d.data = `avg:${st.average}, max:${st.max}, min:${st.min}`)
+      })
     },
 
     SET_ACTIVITY: (state, active) => {

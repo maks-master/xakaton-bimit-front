@@ -21,7 +21,8 @@
             v-list-item(v-for="d in assignedDevices" :key="d.uuid")
               v-list-item-content
                 v-list-item-title {{ d.name }}
-                v-list-item-subtitle {{ dataBySensor(d) }}
+                v-list-item-subtitle {{ d.data }}
+                //v-list-item-subtitle {{ dataBySensor(d) }}
 
           v-divider.mb-2
           v-list-item
@@ -121,12 +122,12 @@ export default {
       this.SET_DEVICE_EDIT_DIALOG(deviceEditDialog)
     },
 
-    dataBySensor(d){
-      let out = ''
-      let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
-      if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
-      return out
-    },
+    // dataBySensor(d){
+    //   let out = ''
+    //   let data = this.deviceStates.find(sd => sd.deviceUuid == d.uuid)
+    //   if (data) out = `avg:${data.average}, max:${data.max}, min:${data.min}`
+    //   return out
+    // },
 
     generate(){
       let url = `http://hakaton.bimit.ru/world/alarm/create`
