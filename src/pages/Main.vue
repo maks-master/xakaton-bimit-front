@@ -150,7 +150,7 @@
           // this.viewer.camera.eye = [x, y, z]
           // this.viewer.camera.look = [device.position.x, device.position.y, device.position.z]
           
-          object.selected = true
+          // object.selected = true
         }
       },
 
